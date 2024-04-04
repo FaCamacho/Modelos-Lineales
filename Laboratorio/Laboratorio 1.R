@@ -137,10 +137,12 @@ ggplot(data=Florida, aes(x=esp_vida,y=ing_med_hog))+geom_point()+geom_smooth(met
 
 
 
+#Repita el analisis centrando la variable de ingreso
+
+coef(mod2)%*%c(1,60)
 
 
-
-
+predict(mod2,newdata)
 
 
 
