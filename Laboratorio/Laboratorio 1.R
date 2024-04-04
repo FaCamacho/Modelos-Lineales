@@ -89,7 +89,8 @@ ggplot(data=Florida)+geom_point(aes(x=esp_vida,y=ing_med_hog))
 #Estime el valor de correlacion de la esperanza de vida con cada variable explicativa
 
 
-round(cor(variables_X),2)
+round(cor(variables_X),4)
+
 
 
 
@@ -118,14 +119,21 @@ summary(mod2)
 
 
 
+0.5509**2
+
+#Agregue la recta de regresion al diagrama de dispersion
 
 
 
+ggplot(data=Florida,aes(x=esp_vida,y=pct_bpeso))+geom_point()+geom_smooth(method = "lm", se=F, col =2, size =2)
 
+ggplot(data=Florida,aes(x=esp_vida,y=pct_bpeso))+geom_point()+geom_smooth(method = "lm", se=F, col =2, size =2)
 
+ggplot(data=Florida,aes(x=esp_vida,y=pct_bpeso))+geom_point()+geom_smooth(method = "lm", se=F, col =2, size =2)
 
+ggplot(data=Florida,aes(x=esp_vida,y=pct_bpeso))+geom_point()+geom_smooth(method = "lm", se=F, col =2, size =2)
 
-
+ggplot(data=Florida, aes(x=esp_vida,y=ing_med_hog))+geom_point()+geom_smooth(method = "lm", se=F, col =2, size =2)
 
 
 
