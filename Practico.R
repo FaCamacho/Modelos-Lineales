@@ -65,8 +65,14 @@ predict(modh,newdata=data.frame(Distancia=3000))
 
 # Ejercicio 6
 
+library(gcookbook)
+data(heightweight)
 
+Y <- heightweight$weightLb*0.4535
+X <- cbind(1, heightweight$heightIn*2.45)
 
+sum(Y)
+sum(X)
 
 
 

@@ -1,6 +1,7 @@
 library(gcookbook)
 data(heightweight)
 
+
 # creamos el vector Y y la matriz X
 Y <- heightweight$weightLb*0.4535
 X <- cbind(1, heightweight$heightIn*2.45)
