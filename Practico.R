@@ -29,11 +29,11 @@ ggplot(data,aes(x=Distancia,y=tiempoh))+geom_point()+geom_smooth(method = lm,se=
 
 ##############################
 
+
+
 library(tidyverse)
 
-algoh<- data%>%
-  mutate(centrada=Distancia-mean(Distancia)) %>%
-  lm(tiempoh~centrada, data=.)
+algoh<-data%>%mutate(centrada=Distancia-mean(Distancia))%>%lm(tiempoh~centrada, data=.)
   
 algoh[["coefficients"]]
 
@@ -62,6 +62,8 @@ predict(modh,newdata=data.frame(Distancia=3000))
 
 
 
+
+# Ejercicio 6
 
 
 
