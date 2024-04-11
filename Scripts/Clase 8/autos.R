@@ -152,7 +152,7 @@ s2 <- sum(residuals(mod)^2)/(n - k - 1)
 eFe <- t(C%*%betas - b) %*% solve(C %*% solve(t(X) %*% X) %*% t(C)) %*% (C%*%betas - b) /(q*s2)
 
 # p-valor
-1 - pf(eFe, k, n - k - 1)
+1 - pf(eFe, q, n - k - 1)
 
 # en este caso el modelo podria reducirse a
 mod_red <- lm(ingresos ~ I(educacion + experiencia), data=ingresos)
