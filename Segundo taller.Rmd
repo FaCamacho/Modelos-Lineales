@@ -119,9 +119,52 @@ mod2 <- lm(esp_vida ~  pct_obesidad + imh , data = Alabama)
 
 mod2 <- update(mod, .~pct_obesidad + imh)
 
-coef(mod2)
+summary(mod2)
+
+#Acá estoy comparando el modelo donde forcé a que las variables que quite tengan valor 0 contra el otro
+
+anova(mod2,mod)
+
+#Teniendo las variables obesidad e ingreso las otras variables no aportan al modelo.
+#No rechazo Ho) donde los betas de las variables que quité valen 0
+
+
+#p-valor en una F con 3,61 GL
+1-pf(1.2632 , 3,61)
+
+
+
+#Podemos decir que por cada unidad que aumenta el porcentaje de personas con obesidad la esperanza de vida del condado desciende un mes?
+
 
 summary(mod2)
+
+-0.094*12
+
+#es -1.128 significativamente un mes?
+
+confint(mod2)
+
+c(confint(mod2)[2,1]*12,confint(mod2)[2,2]*12)
+
+#el -1 está incluido en el intervalo
+
+
+```
+
+
+```{r}
+#MÁS INFERENCIA
+
+#Ho) B_pct_est_terc <= 0
+#H1) B_pct_est_terc > 0
+
+
+#Realice la predicción de la esperanza de vida para un condado con 35% de personas obesas 
+#y un ingreso mediano de 50000
+
+predict(mod2, Alabama)
+
 
 ```
 
