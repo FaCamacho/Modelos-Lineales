@@ -14,7 +14,6 @@ summary(base)
 #hacer Peso_gr como cúmero
 Peso_gr<-as.numeric(base$Peso_gr)
 
-
 #Quitar Peso_gr en caracteres
 base <- base[,-2]
 
@@ -22,3 +21,4 @@ base <- base[,-2]
 base <- cbind(base,Peso_gr)
 
 summary(base)
+
