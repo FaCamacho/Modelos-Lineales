@@ -174,17 +174,12 @@ ggplot(datos1, aes(x = pred, y = t_i)) +
 datos1$I47 <- 0
 datos1$I47[47]<-1
 
-breusch_pagan(mod)
+mod2 <- lm(score ~gatos + perros +pajaros+insectos+I47, data = datos1)
 
-#Alterao los residuos
+breusch_pagan(mod2)
 
-datos1$r_i <- residuals(mod1)
 
-# los elevamos al cuadrado
-datos1$r2_i <- datos1$r_i^2
 
-# ajustamos la regresion auxiliar
-mod_aux <- lm(r2_i ~ gatos + perros+pajaros+insectos, data = datos1)
 
 
 breusch_pagan(mod)
