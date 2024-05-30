@@ -179,11 +179,18 @@ mod2 <- lm(score ~gatos + perros +pajaros+insectos+I47, data = datos1)
 breusch_pagan(mod2)
 
 
+h_i <- influence(mod2)$hat
+D_i <- cooks.distance(mod2)
+df <- data.frame(i = 1:nrow(datos1),
+                 h_i = h_i,
+                 D_i = D_i)
 
 
-
-breusch_pagan(mod)
-
-
-
+# Distancia de Cook
+ggplot(df, aes(x = i, y = D_i)) +
+  geom_point() +
+  geom_segment(aes(x = i, xend = i, y = 0, yend = D_i)) +
+  xlab('') +
+  ylab(expression(D[i])) +
+  geom_abline(slope = 0, intercept = 4/50, col = 2, linetype = 'dashed')
 
