@@ -1,0 +1,83 @@
+---
+title: "Trabajo final"
+author: "matias"
+date: '`r Sys.Date()`'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(here)
+#install.packages("mixlm")
+library(mixlm)
+```
+
+```{r}
+datos <- read_excel(here("Datos","biometria_peces.xlsx"))
+colores <- c("#003f5c", "#7a5195", "#ef5675", "#ffa600")
+```
+
+## Aalisis exploratorio de los datos
+
+Para visualizar las correlaciones de las variables cuantitativas, nos creamos una matrix de correlacion, en la cual podemos observar una alta correlacion entre el peso del pez y la longitud, como tambien entre los distintos tipos de longituddes.
+
+```{r}
+datos = datos %>%  mutate(Peso_gr = as.numeric(Peso_gr))
+cuanti = datos %>%  select(2:7) 
+
+
+matriz_correlacion <- cor(cuanti) 
+
+ p =ggcorrplot::ggcorrplot(
+        matriz_correlacion,
+        method = "circle", 
+        type = "upper",
+        outline.col = "black",
+        ggtheme = ggplot2::theme_gray,
+        legend.title = "Correlacion",
+        colors = c(tail(colores, 1), "#ffffff", colores[1])
+      ) + 
+      guides(
+        fill = guide_colorbar(barheight = grid::unit(0.75, "npc"))
+      )
+ 
+ p
+ 
+```
+
+Ahora observamos como se comportan las distintas especies respecto a la variable de dependiente
+
+```{r}
+
+ggplot(datos,aes(x=Especie,y=Peso_gr)) + geom_boxplot()
+```
+
+## Selección de modelo
+
+Metodo backward, el cual parte de todas las variables. 
+Con este metodo, en 3 pasos quita ls variables Ancho_cm y Longitud3,y altura_cm  para quedarse con un modelo reducido en el cual intenta explicar el peso en funcion a las variables explicativas especie, longitud2 y longitud1 
+```{r}
+datos
+
+
+
+f <- Peso_gr ~ Especie + Longitud1 + Longitud2 + Longitud3 + Altura_cm + Ancho_cm
+
+
+mod0 <- lm(f, data=datos)
+mod0$call[[2]]<-f
+
+length(coef(mod0))
+
+modB <- backward(mod0, alpha = 0.05)
+summary(modB)
+
+
+
+
+```

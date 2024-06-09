@@ -1,0 +1,313 @@
+---
+title: "Lab seleccion de modelos"
+author: "matias"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Tengo una sola Y y 5 variable 
+
+La cantidad de modelos posibles es  $2^k -1$ variables explicativas 
+
+
+
+```{r}
+# hoy hacemos seleccion de variables con los datos de fertilidad de suiza en 1888.
+
+library(ggplot2)
+
+data(swiss)
+help(swiss)
+
+# estadistica descriptiva
+head(swiss)
+summary(swiss)
+
+# Cuando tenemos 'pocas' variables explicativas y el objetivo esta en SELECCIONAR las
+# variables relevantes para predecir/explciar a Y es posible ajustar todos los posibles modelos.
+
+# se cuenta con k=5 variables explicativas
+# el numero de modelos a ajustar es
+k <- 5
+(nmod <- 2^k-1)
+
+# utilicemos la funcion 'regsubset' del paquete 'leaps'
+
+library(leaps)
+
+todos <- regsubsets(Fertility~., data = swiss, nvmax = 5, nbest = 10) ##  hace el modelo usando todas las posibles x_i , los * marcan cuantas variables tiene el modelo
+summary(todos)
+
+# una forma un poco mas amigable de realizar el 'summary' es a traves de la libreria HH
+install.packages("HH")
+library(HH)
+a = summaryHH(todos)
+
+## El mejor es el que tenga mayor  R2 
+## El tema es cuando entro a agregar variables 
+## EL BIC o AIC cuanto mas chico mejor 
+## Con 5 variables esto lo podria utiilizar
+## nvmax a lo sumo k variables explicativas 
+## el que tiene el mejor r cuadrado es el 4 y 5 , y desempata el bic. Con k param tiene mayor penalizacion 
+## el bic suele ser negativo. 
+## en terminos de sig puede pasar que algunas no lo sean. 
+
+## idea exploratoria de cuales son las mejores variables 
+## hacer PH para ver si la variable que omite en el modelo 5 es sig o no 
+
+
+
+
+
+
+# para reducir un poco la salidas es posible solicitar solo el mejor modelo con
+# cada cantidad de variables mediante el argumento 'nbest=1'
+todos1 <- regsubsets(Fertility~., data = swiss, nvmax = 5, nbest = 1)
+summaryHH(todos1)
+
+# podemos graficar los indicadores segun el numero de variables
+k <- seq(5)
+r2 <- summary(todos1)$rsq
+r2aj <- summary(todos1)$rsq
+bic <- rsq <- summary(todos1)$bic
+indi <- data.frame(k,r2,r2aj,bic)
+library(tidyverse)
+ggplot(indi, aes(x = k, y = r2aj)) +
+  geom_point(col = 2, size = 4) +
+  geom_line() +
+  xlab('N° de variables') +
+  ylab('R2 ajustado')
+
+ggplot(indi, aes(x = k, y = bic)) +
+  geom_point(col = 2, size = 4) +
+  geom_line() +
+  xlab('N° de variables') +
+  ylab('BIC')
+
+
+
+# Procedimientos basados en test de hipotesis
+installed.packages("mixlm")
+library(mixlm)
+
+# En todos los casos se necesita un modelo cuya formula incluya todas las variables a
+# usar en el procedimiento.
+## para que mix funcione la tengo que dar todas las variables 
+
+install.packages("faraway")
+library(faraway)
+data(meatspec)
+
+# creamos la formula
+f <- paste('fat',paste(paste('V',1:100,sep=''),collapse='+'),sep='~')
+## armo la formula con paste v1 v2 v3 ...  v100 
+mod0 <- lm(f, data=meatspec)
+# Nota: la funcion no acepta formulas del estilo y~.
+
+# Otra nota: antes de poder emplear estas funciones, es necesario que la formula
+# ESTE en la llamada (call) del objeto 'lm'.
+
+mod0$call[[2]]<-f ## le tengo que poner esto para que no se rompa 
+
+# forward
+
+modF <- forward(mod0, alpha = 0.05)
+length(coef(modF))  # parametros
+summary(modF)
+
+## elijio la var ,  la F no es la sig global, sino la parcial 
+## en un momento deja de aumentar tanto el R2 ajustado 
+# backward
+##modf modelo final del forward 
+
+modB <- backward(mod0, alpha = 0.05)
+length(coef(modB))  # parametros
+summary(modB)
+## back te saca variables 
+## con alfa al 1% saca mas, ya qeu es mas exigente. 
+## mas chico el alfa, mas chico o parsimonioso el modelo. 
+
+
+
+# stepwise
+modS <- stepWise(mod0, alpha.enter = 0.04, alpha.remove=0.05)
+length(coef(modS))  # parametros
+summary(modS)
+
+## in out la variable entro si dice 1 
+
+
+
+# Procedimientos basados en regularizacion
+install.packages("glmnet")
+library(glmnet)
+
+data(fat)
+# queremos seleccionar las mediciones relevantes para 
+# estimar el porcentaje de grasa
+
+porc_grasa <- fat$brozek
+medidas <- as.matrix(fat[,-seq(5)])
+
+lambda <- cv.glmnet(y = porc_grasa,
+                    x = medidas,
+                    alpha = 0,
+                    lambda = seq(0.01,2,0.01)) ## usa esos valores de lambda 
+plot(lambda)
+lambda_opt <- lambda$lambda.min
+
+# mismo grafico pero cambiando el eje x
+cv <- data.frame(lambda = lambda$lambda, mse = lambda$cvm)
+ggplot(cv, aes(x = lambda, y = mse)) +
+  geom_line(col=2) +
+  xlab(expression(lambda)) +
+  ylab('ECM')
+
+
+# ajustamos el modelo con el valor de lamda_opt
+modR <- glmnet(y = porc_grasa,
+               x = medidas,
+               alpha = 0,
+               lambda = lambda_opt)
+
+# es posible obtener los coeficientes
+coef(modR)
+
+# el modelo de RLM se obtiene con lambda=0
+mlr <- glmnet(y = porc_grasa,
+              x = medidas,
+              alpha = 0,
+              lambda = 0)
+
+# es posible visualizaar los coeficientes para todos los 
+# valores de lambda
+todos <- glmnet(y = porc_grasa,
+                x = medidas,
+                alpha = 0,
+                lambda = seq(0.01, 2, 0.01))
+
+# extremos los coeficientes
+betas <- as.matrix(todos$beta)
+# y los valores de lambda
+lambda <- todos$lambda
+# creamos un data.frame
+df <- data.frame(lambda = lambda, t(betas))
+
+library(tidyr)
+df %>% 
+  gather(key = variable, value = valor,-lambda) %>%
+  ggplot(aes(x = lambda, y = valor, group = variable)) +
+    geom_line(aes(color = variable)) +
+    xlab(expression(lambda)) +
+    ylab(expression(hat(beta))) +
+    geom_hline(yintercept = 0)
+
+# A partir de este grafico podemos pensar que para que
+# efectivamente se seleccionen variables, se deberia incrementar
+# el valor maximo de lambda
+
+todos10 <- glmnet(y = porc_grasa,
+                  x = medidas,
+                  alpha = 0,
+                  lambda = seq(0.01, 100, 0.1))
+
+# extremos los coeficientes
+betas <- as.matrix(todos10$beta)
+# y los valores de lambda
+lambda <- todos10$lambda
+# creamos un data.frame
+df <- data.frame(lambda = lambda, t(betas))
+
+# grafico
+df %>% 
+  gather(key = variable, value = valor,-lambda) %>%
+  ggplot(aes(x = lambda, y = valor, group = variable)) +
+    geom_line(aes(color = variable)) +
+    xlab(expression(lambda)) +
+    ylab(expression(hat(beta))) +
+    geom_hline(yintercept = 0)
+
+
+
+# comparamos los errores de prediccion (ojo...)
+predR <- predict(modR, newx = medidas)
+predMLR <- predict(mlr, newx = medidas)
+
+# ECM ridge
+mean((porc_grasa - predR)^2)
+# ECM modelo lineal (lambda=0)
+mean((porc_grasa - predMLR)^2)
+
+# entonces, ¿por que el metodo no eligio lambda=0?
+# porque hizo validacion cruzada
+
+# hagamos cv de forma 'manual' para el MLR
+m <- 10
+n <- nrow(fat)
+folds <- c(rep(1:m, each=25),10,10)
+pred_vc <- rep(NA, n)
+
+for (i in 1:m){
+  x <- medidas[folds != i, ]
+  y <- porc_grasa[folds != i]
+  betas_i <- solve(t(x) %*% x) %*% t(x) %*% y
+  pred_vc[folds == i] <- medidas[folds == i, ] %*% betas_i
+}
+
+mean((porc_grasa-pred_vc)^2)
+
+# es mas, nuestro R2 puede no ser tan alto despues de todo
+mod_fat <- lm(brozek~height+adipos+free+neck+chest+abdom+hip+thigh+knee+ankle+biceps+forearm+wrist, data=fat)
+summary(mod_fat)
+
+# R2 usando vc
+1 - sum((porc_grasa - pred_vc)^2)/sum((porc_grasa - mean(porc_grasa))^2)
+
+# Esto se debe a que el R2 que conocemos se basa en predicciones
+# 'dentro' de la muestra. Esto es, predice observaciones
+# empleando un modelo que se construyo a partir de esas mismas
+# observaciones.
+
+# En la practica, nos interesan situaciones simialres a las 
+# de VC donde predecimos nuevas observaciones sin incluirlas
+# en el modelo.
+
+
+
+# LASSO
+# Empleamos la misma funcion pero con alpha = 1
+
+# Para visualizar la seleccion de variables, comencemos realizando el grafico
+# de las estimaciones en funcion de lambda
+
+lasso5 <- glmnet(y = porc_grasa,
+                 x = medidas,
+                 alpha = 1,
+                 lambda = seq(0.01, 5, 0.01))
+
+# extremos los coeficientes
+betas <- as.matrix(lasso5$beta)
+# y los valores de lambda
+lambda <- lasso5$lambda
+# creamos un data.frame
+df <- data.frame(lambda = lambda, t(betas))
+
+# grafico
+df %>% 
+  gather(key = variable, value = valor,-lambda) %>%
+  ggplot(aes(x = lambda, y = valor, group = variable)) +
+    geom_line(aes(color = variable)) +
+    xlab(expression(lambda)) +
+    ylab(expression(hat(beta))) +
+    geom_hline(yintercept = 0)
+
+esos <- which(lambda %in%c(0.5,1.5,5))
+matriz <- cbind(lambda,t(betas))
+round(matriz[esos,],3)
+
+```
+

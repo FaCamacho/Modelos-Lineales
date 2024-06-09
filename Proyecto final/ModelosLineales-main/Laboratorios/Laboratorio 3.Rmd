@@ -1,0 +1,142 @@
+---
+title: "Laboratorio 3 - Parcialidad "
+author: "matias"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# ejemplo del aumento de peso segun edad y nivel de actividad fisica
+
+library(readxl)
+library(here)
+
+datos <- read_excel(here("Datos","betas_parciales.xlsx"))
+str(datos)
+summary(datos)
+
+# las variables son:
+#  wt_gain_gr: el aumento de peso el ultimo anio (en gramos)
+#  age: edad (en anios enteros)
+#  AF_index: nivel de actividad fisica (valor entre 0 y 10, 0 sedentario, 10 muy activo)
+
+
+# queremos indagar sobre la relacion entre el aumento de peso y la actividad fisica
+## diagrama de dispersiion 
+library(ggplot2)
+ggplot(datos, aes(x = AF_index, y = wt_gain_gr)) +
+  geom_point(size=2) + theme_bw() +
+  xlab('Indice de Actividad Fisica') +
+  ylab('Aumento de peso (gr)')
+```
+## cuanto mas alto el indice de actividad fisica, disminuye el aumento de peso 
+```{r}
+# Al estimar los coeficientes del modelo
+mod1 <- lm(wt_gain_gr ~ AF_index, data = datos)
+coef(mod1) ## me saca los coeficientes 
+## modelo de regresion lineal simple 
+# Es probable que al aumentar la edad, las personas tengan
+# cierta 'facilidad' a aumentar de peso.
+
+## se estima que ante un aumento en una unidad en la actividad fisica, el peso aumente  en promedio 98.32 gramos menos 
+
+# intercepto: cuando la actividad fisica es nula,  se espera que el peso sea de  745 gramos (3/4 kilos )
+```
+AF juega el papel de B_j
+
+Se estima que al aumentar en una unidad la actividad fisica, en promedio disimuye -98g el aumento de peso (ver)
+```{r}
+ggplot(datos, aes(x = age, y = wt_gain_gr)) +
+  geom_point(size=2) + theme_bw() +
+  xlab('Edad') +
+  ylab('Aumento de peso (gr)')
+
+```
+
+```{r}
+ggplot(datos, aes(x = age, y = wt_gain_gr)) +
+  geom_point(size=2) + theme_bw() +
+  xlab('Edad') +
+  ylab('Aumento de peso (gr)')
+```
+
+
+
+```{r}
+# Ajustemos el analisis segun la edad
+
+mod2 <- update(mod1, .~. + age) ## actualiza el modelo y le agrega la edad (modelo multiple)
+# esto es lo mismo que:
+# mod2 <- lm(wt_gain_gr ~ AF_index + age, data = datos)
+
+coef(mod2)
+
+
+```
+Se estima que aunte un aumento en un anio en la edad, en promedio el peso aumenta 12.55g asumiento las demas variables ctes 
+
+Hay un efecto dfe la edad que es sobre la actividad fisica, lo que decimos la edad  esta mediando el efecto de la actividad fisica. 
+
+Cambia los valores estimados cuando ajustamos por otras variables explicativas, esto pasa cuando las variables explicativas estan muy corerrelacionadas ente si
+
+Cuando las variables estan correlacionadas compiten para estimar Y.
+
+Lo que pasa en estudios cuantitativos, donde no podemos controlar las variables explicativas, nunca las variables van a estar incorrelacionadas entre si. 
+
+Si la estimacion se mantiene igual , estan incorrelacionadas.
+
+ 
+
+```{r}
+# la explicacion radica en:
+with(datos, cor(age, AF_index)) # hay alta correlacion negativa entre las x , mas inesatable es la estimacion del modelo, la estimacion de los betas dependen de los otros  
+ggplot(datos, aes(x = age, y = AF_index)) +
+  geom_point(size=2) + theme_bw() +
+  xlab('Edad') +
+  ylab('Indice de Actividad Fisica')
+summary(mod2)
+
+
+```
+
+```{r}
+# Al estimar los coeficientes del modelo
+mod1 <- lm(wt_gain_gr ~ AF_index, data = datos)
+coef(mod1)
+
+# Es probable que al aumentar la edad, las personas tengan
+# cierta 'facilidad' a aumentar de peso.
+
+ggplot(datos, aes(x = age, y = wt_gain_gr)) +
+  geom_point(size=2) + theme_bw() +
+  xlab('Edad') +
+  ylab('Aumento de peso (gr)')
+
+# Ajustemos el analisis segun la edad
+
+mod2 <- update(mod1, .~. + age)
+# esto es lo mismo que:
+# mod2 <- lm(wt_gain_gr ~ AF_index + age, data = datos)
+
+coef(mod2)
+
+# la explicacion radica en:
+with(datos, cor(age, AF_index))
+ggplot(datos, aes(x = age, y = AF_index)) +
+  geom_point(size=2) + theme_bw() +
+  xlab('Edad') +
+  ylab('Indice de Actividad Fisica')
+```
+
+
+
+
+
+
+
+
+

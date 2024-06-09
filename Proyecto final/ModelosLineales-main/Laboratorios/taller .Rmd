@@ -1,0 +1,180 @@
+---
+title: "Laboratorio"
+author: "matias"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+```{r}
+library(here)
+library(tidyverse)
+dat<- read_excel("Datos/condados (1).xlsx", na = "NA")
+
+alabama= dat %>%  select(pct_diabetes,pct_obesidad,pct_est_terc,ing_med_hog,pct_bpeso,estado,esp_vida) %>% filter( estado == "Alabama") %>%  mutate(  ing_med_hog = ing_med_hog /1000)
+
+mod1 = lm(esp_vida ~ pct_diabetes + pct_obesidad +  pct_est_terc + ing_med_hog + pct_bpeso, data = alabama)
+
+summary(mod1)
+
+
+round(coef(mod1),4)
+
+
+```
+Cuanto vale la estimacion del coeficiente asociado al ingreso?
+
+cuando el ingreso aumenta 1 peso, en promedio la esperanza aumenta 0.001 anio dejando todo lo demas constante 
+
+lo divido entre miles de pesos 
+
+si tuviese 1000 doalres mas, la esperanza de vida aumenta en promedio 0.08 anios de vida 
+
+por cada 1000 dolares, la esperanza de vida aumenta en promedio 0.08 anios de vida, (1 mes casi) dejando todo lo  demas cte 
+
+ver significacion individual 
+
+
+5) Cuanto vale el R^2? 
+```{r}
+names(summary(mod1))
+
+
+```
+
+
+explica el 52% de la variabilidad de la esperanza de vida con los regresores estimados 
+
+
+
+```{r}
+
+resudios = as.data.frame(x = fitted(mod1) , y = fitted(mod1))
+
+
+k = cbind(resudios,alabama)
+
+
+y = fitted(mod1)
+e = residuals(mod1)
+alabama$y_1 = fitted(mod1)
+
+alabama$e_1 = residuals(mod1)
+
+
+##data2 = as.data.frame(x = )
+
+
+alabama %>%  ggplot(aes(x = y_1, y = e_1)) + geom_point()
+
+```
+
+Es el modelo significativo?
+
+El modelo es significativo, al 5% , 1% ....
+
+
+que variables explicativas son significativas al 5%
+
+p.valor < 0.05 
+
+pct_obesidad y ing_med_hog  son significativos 
+
+
+el coeficiente de diabetes ni lo miro 
+
+
+
+p.valor < 0.01 
+
+l unica significativa es el ingreso 
+
+1 chance en 100 de estar equivocado 
+
+esto lo muestra la t - student 
+
+cuantos grados de libertad usa? 
+
+n - k - 1 
+
+61 
+
+la significacion global? 
+
+```{r}
+?drop1
+class(mod1)
+
+drop1(mod1 , test = "F")
+
+drop1(mod1)
+
+## drop se lo ajusto a 1 modelo 
+## suma de cuadrados residuales de un modelo donde dropea las variables 
+
+## mismo valor que summary  ,  t^2 = F con  1 grado de libertad 
+
+## esto existe para var cualiativias 
+
+## ejemplo ed maxima alcanzada, var categoricas, sig de cada cat pero no de toda la variable 
+
+
+# sumarry mejorado cuando tengamos un regresor cualitativo 
+
+
+
+
+```
+
+```{r}
+
+ mod2 =update(mod1, .~ pct_obesidad + ing_med_hog)
+
+summary(mod2)
+```
+
+```{r}
+anova(mod2,mod1)
+
+summary(anova(mod2,mod1))
+
+## es poco, el pvalor es 0.295 
+
+# la hip nula no la rechazo, 
+
+# no sirven para nada si no considero el modelo 2 
+
+
+ 1- pf(1.2632, 3,61)
+
+```
+
+```{r}
+confint(mod2)*12
+```
+
+
+disminuye 1 mes   la esperanza de vida cuando aumento 0.094 puntos porce la obesidad  
+
+
+
+Realice la prediccion de la esperanza de vida para un condado con 35% de personas obesas 
+
+
+
+```{r}
+
+
+predict(mod2, newdata = data.frame( pct_obesidad =0.35, ing_med_hog = 50000/1000) , interval = 'confidence')
+
+```
+
+
+```{r}
+for( )
+```
+

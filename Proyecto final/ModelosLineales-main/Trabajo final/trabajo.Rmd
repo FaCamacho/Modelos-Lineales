@@ -1,0 +1,186 @@
+---
+title: "Trabajo final"
+author: "matias"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(here)
+#install.packages("mixlm")
+library(mixlm)
+library(gridExtra)
+library(car)
+
+
+```
+
+```{r}
+datos <- read_excel(here("Datos","biometria_peces.xlsx"))
+colores <- c("#003f5c", "#7a5195", "#ef5675", "#ffa600")
+```
+
+## Aalisis exploratorio de los datos
+
+Para visualizar las correlaciones de las variables cuantitativas, nos creamos una matrix de correlacion, en la cual podemos observar una alta correlacion entre el peso del pez y la longitud, como tambien entre los distintos tipos de longituddes.
+
+```{r}
+
+datos = datos %>%  mutate(Peso_gr = as.numeric(Peso_gr),Especie = as.factor(Especie) )
+
+
+
+cuanti = datos %>%  select(2:7) 
+
+
+matriz_correlacion <- cor(cuanti) 
+
+ p =ggcorrplot::ggcorrplot(
+        matriz_correlacion,
+        method = "circle", 
+        type = "upper",
+        outline.col = "black",
+        ggtheme = ggplot2::theme_gray,
+        legend.title = "Correlacion",
+        colors = c(tail(colores, 1), "#ffffff", colores[1])
+      ) + 
+      guides(
+        fill = guide_colorbar(barheight = grid::unit(0.75, "npc"))
+      )
+ 
+ p
+ 
+```
+
+Ahora observamos como se comportan las distintas especies respecto a la variable de dependiente
+
+```{r}
+
+ggplot(datos,aes(x=Especie,y=Peso_gr,fill=Especie)) + geom_boxplot()
+```
+
+## Modelo 1 
+
+
+```{r}
+
+modelo = lm(Peso_gr ~., data = datos)
+
+
+
+
+```
+
+
+## Multicolinealidad
+
+```{r,eval=FALSE}
+## opcion 1 
+datos_dummies= model.matrix(~Especie-1,data=datos)
+
+datos = cbind(datos,datos_dummies)
+
+datos = datos %>%  select(-Especie)
+
+
+
+
+mod <- lm(Peso_gr~ ., data = datos)
+
+
+
+
+vif(mod) ###  Error in vif.default(mod) : there are aliased coefficients in the model  
+
+
+
+##ver
+X <- as.matrix(datos[,-1])
+k <- ncol(X)
+
+lambda <- eigen(t(X)%*%X)$values
+
+
+
+```
+
+
+## Homoscedasticidad 
+
+Como primera etapa de diagnostico para el primer modelo, se opto por estudiar los residuos externamente estandarizados. A continuacion se observa los residuos para cada variable explicativa
+```{r}
+datos$r_i <- residuals(modelo)  
+# residuos
+datos$s_i <- rstandard(modelo)  # studendizados INTERNAMENTE
+datos$t_i <- rstudent(modelo) #studentizados EXTERNAMENTE 
+
+datos$pred <- fitted(modelo)
+
+ggplot(datos, aes(x = pred, y = t_i)) + 
+  geom_point(color = "red",alpha=0.5,size=1)+
+
+  xlab('Predichos') +
+  ylab('Residuos') +
+ geom_abline(slope=0, intercept=c(-1,1), linetype="dashed",color="blue")+
+  geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()
+
+
+
+```
+```{r}
+
+grafico = function(variable) {
+  ggplot(datos,aes(x=.data[[variable]],y=.data[["t_i"]])) +
+    geom_point(alpha=0.5,size=1,color = "red") +
+  
+    labs(x = variable, y = "t_i") + 
+ geom_abline(slope=0, intercept=c(-1,1), linetype="dashed",color="blue") +  geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()
+}
+
+x1=grafico("Longitud1")
+x2= grafico("Longitud2")
+x3=grafico("Longitud3")
+x4=grafico("Altura_cm")
+x5= grafico("Ancho_cm")
+x6 = grafico("Especie")
+
+grid.arrange(x1,x2,x3,x4,x5,x6,ncol=2,nrow=3)
+
+
+
+```
+
+
+
+## Selección de modelo
+
+Metodo backward, el cual parte de todas las variables. 
+Con este metodo, en 3 pasos quita ls variables Ancho_cm y Longitud3,y altura_cm  para quedarse con un modelo reducido en el cual intenta explicar el peso en funcion a las variables explicativas especie, longitud2 y longitud1 
+```{r,eval=FALSE}
+datos
+
+
+
+f <- Peso_gr ~ Especie + Longitud1 + Longitud2 + Longitud3 + Altura_cm + Ancho_cm
+
+
+mod0 <- lm(f, data=datos)
+mod0$call[[2]]<-f
+
+length(coef(mod0))
+
+modB <- backward(mod0, alpha = 0.05)
+summary(modB)
+
+
+
+
+```

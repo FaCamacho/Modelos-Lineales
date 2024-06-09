@@ -1,0 +1,94 @@
+---
+title: "Laboratorio - diagnostico"
+author: "matias"
+date: '`r Sys.Date()`'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# Diagnostico - Datos influyentes
+
+# Continuemos con los datos de la tasa de ahorro
+library(faraway)
+data(savings)
+
+mod <- lm(sr ~ pop15 + pop75 + dpi + ddpi, data = savings)
+savings$t =rstudent(mod)
+sort(abs(savings$t))
+
+qt(0.995, 50 -5)
+
+plot(rstudent(mod), pch=16) 
+abline(h=0, lty =-1)
+
+
+abline ## con el segundo  valor no rechazo HO
+
+# medidas de influencia
+h_i <- influence(mod)$hat ## h_i 
+names(h_i)
+D_i <- cooks.distance(mod) ## distancia de cook 
+df <- data.frame(i = 1:nrow(savings),
+                h_i = h_i,
+                D_i = D_i)
+
+library(ggplot2)
+
+# leverage
+ggplot(df, aes(x = i, y = h_i)) +
+  geom_point() +
+  geom_segment(aes(x = i, xend = i, y = 0, yend = h_i)) +
+  xlab('') +
+  ylab(expression(h[i])) +
+  geom_abline(slope = 0, intercept = 2*5/50, col = 2, linetype = 'dashed')
+
+
+##elementos de la matriz h, si no hay influyentes los palitos tienen que ser parecidos.
+
+# Distancia de Cook
+ggplot(df, aes(x = i, y = D_i)) +
+  geom_point() +
+  geom_segment(aes(x = i, xend = i, y = 0, yend = D_i)) +
+  xlab('') +
+  ylab(expression(D[i])) +
+  geom_abline(slope = 0, intercept = 4/50, col = 2, linetype = 'dashed')
+
+# Los candidatos a ser etiquetados como observaciones influyentes son
+# las observaciones 23 y 49 y 46 
+
+# Observemos como cambia el vector de parametros
+influ <- influence(mod)$coefficients[c(23,49),]
+betas <- rbind(coef(mod), influ) ## quito la 23 o 49
+
+round(betas, 5)
+
+# al quitar ambas observaciones
+mod2 <- update(mod, data = savings[-c(23,49),])
+## sidiinuye el beta asociado ala pob de 15 anios
+
+round(rbind(coefficients(mod),coefficients(mod2)),5)
+
+## libia un residuo muy positivo y japon muy negativo 
+
+savings$I49 = 0
+
+savings$I49[49] = 1
+
+MOD49 = update(mod, .~. + I49 ,data= savings)
+
+
+D_i <- cooks.distance(MOD49) ## distancia de cook 
+df <- data.frame(i = 1:nrow(savings),
+                h_i = h_i,
+                D_i = D_i)
+
+residuals(MOD49)
+
+## saco esas 2 variables y no quedan var significarivas. el R2 baja sensibliemente , esos dos estaban chinchanso la recta de regresion.
+
+```
+
