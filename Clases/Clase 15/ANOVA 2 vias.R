@@ -68,6 +68,7 @@ anova(mod1)
 # para comparar Vidrios o Temperaturas
 library(emmeans)
 library(multcomp)
+library(multcompView)
 
 # comparamos niveles de vidrio
 vidrio <- emmeans(mod1, ~Glass)

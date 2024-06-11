@@ -24,7 +24,11 @@ library(car)
 ```
 
 ```{r}
-datos <- read_excel(here("Datos","biometria_peces.xlsx"))
+
+biometria_peces <- read_excel("Proyecto final/ModelosLineales-main/Datos/biometria_peces.xlsx")
+datos = biometria_peces
+
+#datos <- read_excel(here("Datos","biometria_peces.xlsx"))
 colores <- c("#003f5c", "#7a5195", "#ef5675", "#ffa600")
 ```
 
@@ -109,6 +113,16 @@ k <- ncol(X)
 lambda <- eigen(t(X)%*%X)$values
 
 
+
+#Algo distinto
+
+datos = biometria_peces
+
+datos = datos %>%  mutate(Peso_gr = as.numeric(Peso_gr),Especie = as.factor(Especie)  )
+
+mod <- lm(Peso_gr~ ., data = datos)
+
+vif(mod)
 
 ```
 
