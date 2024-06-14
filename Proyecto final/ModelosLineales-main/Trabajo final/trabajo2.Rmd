@@ -258,7 +258,7 @@ max(datos$Peso_gr)
 
 datos <- datos[-which.max(datos$Peso_gr),]
 
-datos <- datos[-30,]
+
 
 
 
