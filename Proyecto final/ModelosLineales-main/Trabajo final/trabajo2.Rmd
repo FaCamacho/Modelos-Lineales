@@ -42,7 +42,7 @@ datos = biometria_peces
 
 ## Aalisis exploratorio de los datos
 
-```{r,"Fabricio"}
+```{r}
 
 str(datos)
 
@@ -57,16 +57,14 @@ summary(datos)
 
 datos <- datos %>% filter(.,Peso_gr > 0)
 
-
+summary(datos)
 
 
 ```
 
 ## Análisis de supuestos
 #Multicolinealidad
-```{r, "Fabricio"}
-
-
+```{r}
 
 
 #Analizando multicolinealidad
@@ -77,11 +75,9 @@ vif(lm(Peso_gr~ .-Especie, data = datos))
 
 vif(lm(Peso_gr~ .-Especie-Longitud2, data = datos))
 
-
 #Quitando Long3
 
 vif(lm(Peso_gr~ .-Especie-Longitud2-Longitud3, data = datos))
-
 
 #Variables seleccionadas -> "Longitud1" , "Altura_cm" , "Ancho_cm"
 
@@ -94,46 +90,6 @@ vif(lm(Peso_gr~ .-Especie-Longitud2-Longitud3, data = datos))
 
 Para visualizar las correlaciones de las variables cuantitativas, nos creamos una matrix de correlacion, en la cual podemos observar una alta correlacion entre el peso del pez y la longitud, como tambien entre los distintos tipos de longituddes.
 
-```{r}
-
-
-
-
-
-datos2 =  datos2[-,]
-
-
-
-cuanti = datos %>%  select(2:7) 
-
-
-matriz_correlacion <- cor(cuanti) 
-
- p =ggcorrplot::ggcorrplot(
-        matriz_correlacion,
-        method = "circle", 
-        type = "upper",
-        outline.col = "black",
-        ggtheme = ggplot2::theme_gray,
-        legend.title = "Correlacion",
-        colors = c(tail(c("#003f5c", "#7a5195", "#ef5675", "#ffa600"), 1), "#ffffff", c("#003f5c", "#7a5195", "#ef5675", "#ffa600")[1])
-      ) + 
-      guides(
-        fill = guide_colorbar(barheight = grid::unit(0.75, "npc"))
-      )
- 
- p
- 
-```
-
-Ahora observamos como se comportan las distintas especies respecto a la variable de dependiente
-
-```{r}
-
-ggplot(datos,aes(x=Especie,y=Peso_gr,fill=Especie)) + geom_boxplot()
-```
-
-
 
 
 ## Homoscedasticidad 
@@ -141,22 +97,16 @@ ggplot(datos,aes(x=Especie,y=Peso_gr,fill=Especie)) + geom_boxplot()
 Como primera etapa de diagnostico para el primer modelo, se opto por estudiar los residuos externamente studentizados A continuacion se observa los residuos para cada variable explicativa
 ```{r,"Fabricio"}
 
-modelo <- lm(Peso_gr~ .-Especie-Longitud2-Longitud3, data = datos)
+modelo <- lm(Peso_gr~ Longitud1+Altura_cm+Ancho_cm, data = datos)
 
 datos$r_i <- residuals(modelo)  
+
 # residuos
-#datos$s_i <- rstandard(modelo)  # studendizados INTERNAMENTE
+
 datos$t_i <- rstudent(modelo) #studentizados EXTERNAMENTE 
 
 datos$pred <- fitted(modelo)
 
-ggplot(datos, aes(x = pred, y = t_i)) + 
-  geom_point(color = "red",alpha=0.5,size=1)+
-
-  xlab('Predichos') +
-  ylab('Residuos') +
- geom_abline(slope=0, intercept=c(-1,1), linetype="dashed",color="blue")+
-  geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()
 
 breusch_pagan(modelo) #No rechazo H0)
 
@@ -181,16 +131,16 @@ datos$t_i <- rstudent(modelo_ajustado) #studentizados EXTERNAMENTE
 
 datos$pred <- fitted(modelo_ajustado)
 
+
+breusch_pagan(modelo_ajustado) #Rechazo H0)
+
+
 ggplot(datos, aes(x = pred, y = t_i)) + 
   geom_point(color = "red",alpha=0.5,size=1)+
   xlab('Predichos') +
   ylab('Residuos') +
  geom_abline(slope=0, intercept=c(-1,1), linetype="dashed",color="blue")+
   geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()
-
-
-breusch_pagan(modelo_ajustado) #Rechazo H0)
-
 
 
 
@@ -213,7 +163,7 @@ ggplot(qq, aes(x = teoricos, y = empiricos)) +
   ylab('Cuantiles empiricos') +
   geom_abline(slope = 1, intercept = 0, col = 2, size = 1.5)
 
-shapiro.test(datos$t_i) #Rechazo H0) con un 0.006, medio ambiciosos capaz
+shapiro.test(datos$t_i) #Rechazo H0) con un alfa=0.006, medio ambiciosos capaz
 
 
 ggplot(qq, aes(x = empiricos, y=..density..)) +
@@ -261,7 +211,7 @@ which.min(datos$Peso_gr)
 which.max(datos$Peso_gr)
 
 
-datos <- datos[-which.min(datos$Peso_gr),]
+
 
 datos <- datos[-which.max(datos$Peso_gr),]
 
