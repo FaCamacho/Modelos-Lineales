@@ -20,26 +20,91 @@ library(here)
 library(mixlm)
 library(gridExtra)
 library(car)
+library(skedastic)
+library(qqplotr)
+library(tseries)
+
+
+
+
 
 
 ```
 
 ```{r}
 
-biometria_peces <- read_excel("Proyecto final/ModelosLineales-main/Datos/biometria_peces.xlsx")
+
+
+
+
 datos = biometria_peces
 
-#datos <- read_excel(here("Datos","biometria_peces.xlsx"))
-colores <- c("#003f5c", "#7a5195", "#ef5675", "#ffa600")
+id <- seq(1,nrow(datos),1)
+
+datos <- cbind(id,datos)
+
 ```
 
 ## Aalisis exploratorio de los datos
+
+```{r}
+
+str(datos)
+
+datos = datos %>%  mutate(Peso_gr = as.numeric(Peso_gr),Especie = as.factor(Especie) ) %>% 
+  filter(.,Peso_gr > 0)
+
+
+str(datos)
+
+summary(datos)
+
+
+datos = datos %>%  filter(.,Especie != "Pike")
+
+
+
+```
+
+## Análisis de supuestos
+#Multicolinealidad
+```{r}
+
+
+
+
+#Analizando multicolinealidad
+
+vif(lm(Peso_gr~ .-Especie-id, data = datos))
+
+#Quitando Long2
+
+vif(lm(Peso_gr~ .-Especie-id-Longitud2, data = datos))
+
+
+#Quitando Long3
+
+vif(lm(Peso_gr~ .-Especie-id-Longitud2-Longitud3, data = datos))
+
+
+#Variables seleccionadas -> "Longitud1" , "Altura_cm" , "Ancho_cm"
+
+
+
+```
+
+
+
 
 Para visualizar las correlaciones de las variables cuantitativas, nos creamos una matrix de correlacion, en la cual podemos observar una alta correlacion entre el peso del pez y la longitud, como tambien entre los distintos tipos de longituddes.
 
 ```{r}
 
-datos = datos %>%  mutate(Peso_gr = as.numeric(Peso_gr),Especie = as.factor(Especie) )
+
+
+
+
+datos2 =  datos2[-,]
 
 
 
@@ -55,7 +120,7 @@ matriz_correlacion <- cor(cuanti)
         outline.col = "black",
         ggtheme = ggplot2::theme_gray,
         legend.title = "Correlacion",
-        colors = c(tail(colores, 1), "#ffffff", colores[1])
+        colors = c(tail(c("#003f5c", "#7a5195", "#ef5675", "#ffa600"), 1), "#ffffff", c("#003f5c", "#7a5195", "#ef5675", "#ffa600")[1])
       ) + 
       guides(
         fill = guide_colorbar(barheight = grid::unit(0.75, "npc"))
@@ -72,95 +137,19 @@ Ahora observamos como se comportan las distintas especies respecto a la variable
 ggplot(datos,aes(x=Especie,y=Peso_gr,fill=Especie)) + geom_boxplot()
 ```
 
-## Modelo 1 
 
-
-```{r}
-
-modelo = lm(Peso_gr ~., data = datos)
-
-
-
-
-```
-
-
-## Multicolinealidad
-
-```{r,eval=FALSE}
-## opcion 1 
-datos_dummies= model.matrix(~Especie-1,data=datos)
-
-datos = cbind(datos,datos_dummies)
-
-datos = datos %>%  select(-Especie)
-
-
-
-
-mod <- lm(Peso_gr~ ., data = datos)
-
-
-
-
-vif(mod) ###  Error in vif.default(mod) : there are aliased coefficients in the model  
-
-
-
-##ver
-X <- as.matrix(datos[,-1])
-k <- ncol(X)
-
-lambda <- eigen(t(X)%*%X)$values
-
-
-
-#Algo distinto
-
-datos = biometria_peces
-
-datos = datos %>%  mutate(Peso_gr = as.numeric(Peso_gr),Especie = as.factor(Especie)  )
-
-mod <- lm(Peso_gr~ ., data = datos)
-
-vif(mod)
-
-
-
-
-
-#Analizando multicolinealidad
-
-vif(lm(Peso_gr~ .-Especie, data = datos))
-
-#Quitando Long2
-
-vif(lm(Peso_gr~ .-Especie-Longitud2, data = datos))
-
-
-#Quitando Long3
-
-vif(lm(Peso_gr~ .-Especie-Longitud2-Longitud3, data = datos))
-
-#Con especie
-
-vif(lm(Peso_gr~ ., data = datos))
-
-(lm(Peso_gr~ .-Longitud2-Longitud3, data = datos))
-
-```
 
 
 ## Homoscedasticidad 
 
-Como primera etapa de diagnostico para el primer modelo, se opto por estudiar los residuos externamente estandarizados. A continuacion se observa los residuos para cada variable explicativa
+Como primera etapa de diagnostico para el primer modelo, se opto por estudiar los residuos externamente studentizados A continuacion se observa los residuos para cada variable explicativa
 ```{r}
 
-modelo <- lm(Peso_gr~ .-Especie-Longitud2-Longitud3, data = datos)
+modelo <- lm(Peso_gr~ .-Especie-id-Longitud2-Longitud3, data = datos)
 
 datos$r_i <- residuals(modelo)  
 # residuos
-datos$s_i <- rstandard(modelo)  # studendizados INTERNAMENTE
+#datos$s_i <- rstandard(modelo)  # studendizados INTERNAMENTE
 datos$t_i <- rstudent(modelo) #studentizados EXTERNAMENTE 
 
 datos$pred <- fitted(modelo)
@@ -173,9 +162,114 @@ ggplot(datos, aes(x = pred, y = t_i)) +
  geom_abline(slope=0, intercept=c(-1,1), linetype="dashed",color="blue")+
   geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()
 
+breusch_pagan(modelo)
+
+
+grid.arrange(crPlot(modelo,"Longitud1")
+             ,crPlot(modelo,"Altura_cm")
+             ,crPlot(modelo,"Ancho_cm"),
+             ncol=3,nrow=1)
+
+
+#Ajuste logarítmico
+
+modelo_ajustado <- lm(log(Peso_gr) ~ log(Longitud1)+log(Altura_cm)+log(Ancho_cm), data = datos)
+
+
+
+datos$r_i <- residuals(modelo_ajustado)  
+
+# residuos
+
+datos$t_i <- rstudent(modelo_ajustado) #studentizados EXTERNAMENTE 
+
+datos$pred <- fitted(modelo_ajustado)
+
+ggplot(datos, aes(x = pred, y = t_i)) + 
+  geom_point(color = "red",alpha=0.5,size=1)+
+  xlab('Predichos') +
+  ylab('Residuos') +
+ geom_abline(slope=0, intercept=c(-1,1), linetype="dashed",color="blue")+
+  geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()
+
+breusch_pagan(modelo_ajustado)
+
+
+
 
 
 ```
+
+##Normalidad
+
+```{r}
+
+n <- nrow(datos)
+
+z_i <- qnorm(seq(n)/(n + 1))
+
+qq <- data.frame(teoricos = z_i,empiricos = sort(datos$t_i))
+
+ggplot(qq, aes(x = teoricos, y = empiricos)) +
+  geom_point() +
+  xlab('Cuantiles teoricos') +
+  ylab('Cuantiles empiricos') +
+  geom_abline(slope = 1, intercept = 0, col = 2, size = 1.5)
+
+shapiro.test(datos$t_i)
+#tseries::jarque.bera.test(datos$t_i)
+
+ggplot(qq, aes(x = empiricos, y=..density..)) +
+  geom_histogram(breaks = seq(-3, 3, 1), col = 'white') +
+  xlab('Residuos studentizados')
+```
+
+
+
+## Atípicos
+
+```{r}
+
+h_i <- influence(modelo_ajustado)$hat
+D_i <- cooks.distance(modelo_ajustado)
+df <- data.frame(i = 1:nrow(datos),
+                 h_i = h_i,
+                 D_i = D_i)
+
+# Distancia de Cook
+ggplot(df, aes(x = i, y = D_i)) +
+  geom_point() +
+  geom_segment(aes(x = i, xend = i, y = 0, yend = D_i)) +
+  xlab('') +
+  ylab(expression(D[i])) +
+  geom_abline(slope = 0, intercept = 4/50, col = 2, linetype = 'dashed')
+
+```
+
+
+
+
+Ahora sin los pike
+
+```{r}
+
+which.max(datos$Peso_gr)
+max(datos$Peso_gr)
+
+datos <- datos[-which.max(datos$Peso_gr),]
+
+datos <- datos[-30,]
+
+
+
+```
+
+
+
+
+
+
+
 ```{r}
 
 grafico = function(variable) {
