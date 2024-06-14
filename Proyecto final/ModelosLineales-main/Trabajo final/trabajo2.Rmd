@@ -94,8 +94,7 @@ Para visualizar las correlaciones de las variables cuantitativas, nos creamos un
 
 ## Homoscedasticidad 
 
-Como primera etapa de diagnostico para el primer modelo, se opto por estudiar los residuos externamente studentizados A continuacion se observa los residuos para cada variable explicativa
-```{r,"Fabricio"}
+```{r}
 
 modelo <- lm(Peso_gr~ Longitud1+Altura_cm+Ancho_cm, data = datos)
 
@@ -198,7 +197,7 @@ ggplot(df, aes(x = i, y = D_i)) +
 
 
 
-Ahora sin los pike
+Saco el máximo para ver que pasa
 
 ```{r}
 
@@ -206,14 +205,7 @@ summary(datos$Peso_gr)
 
 
 
-which.min(datos$Peso_gr)
-
-which.max(datos$Peso_gr)
-
-
-
-
-datos <- datos[-which.max(datos$Peso_gr),]
+datos2 <- datos[-which.max(datos$Peso_gr),]
 
 
 
@@ -221,57 +213,107 @@ datos <- datos[-which.max(datos$Peso_gr),]
 ```
 
 
-
-
-
-
+## Homoscedasticidad 
 
 ```{r}
 
-grafico = function(variable) {
-  ggplot(datos,aes(x=.data[[variable]],y=.data[["t_i"]])) +
-    geom_point(alpha=0.5,size=1,color = "red") +
-  
-    labs(x = variable, y = "t_i") + 
- geom_abline(slope=0, intercept=c(-1,1), linetype="dashed",color="blue") +  geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()
-}
+modelo <- lm(Peso_gr~ Longitud1+Altura_cm+Ancho_cm, data = datos2)
 
-x1=grafico("Longitud1")
-x2= grafico("Longitud2")
-x3=grafico("Longitud3")
-x4=grafico("Altura_cm")
-x5= grafico("Ancho_cm")
-x6 = grafico("Especie")
+datos2$r_i <- residuals(modelo)  
 
-grid.arrange(x1,x2,x3,x4,x5,x6,ncol=2,nrow=3)
+# residuos
+
+datos2$t_i <- rstudent(modelo) #studentizados EXTERNAMENTE 
+
+datos2$pred <- fitted(modelo)
+
+
+breusch_pagan(modelo) #No rechazo H0)
+
+
+grid.arrange(crPlot(modelo,"Longitud1")
+             ,crPlot(modelo,"Altura_cm")
+             ,crPlot(modelo,"Ancho_cm"),
+             ncol=3,nrow=1)
+
+
+#Ajuste logarítmico
+
+modelo_ajustado <- lm(log(Peso_gr) ~ log(Longitud1)+log(Altura_cm)+log(Ancho_cm), data = datos2)
+
+
+
+datos2$r_i <- residuals(modelo_ajustado)  
+
+# residuos
+
+datos2$t_i <- rstudent(modelo_ajustado) #studentizados EXTERNAMENTE 
+
+datos2$pred <- fitted(modelo_ajustado)
+
+
+breusch_pagan(modelo_ajustado) #Rechazo H0)
+
+
+ggplot(datos2, aes(x = pred, y = t_i)) + 
+  geom_point(color = "red",alpha=0.5,size=1)+
+  xlab('Predichos') +
+  ylab('Residuos') +
+ geom_abline(slope=0, intercept=c(-1,1), linetype="dashed",color="blue")+
+  geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()
+
 
 
 
 ```
 
+##Normalidad
+
+```{r}
+
+n <- nrow(datos2)
+
+z_i <- qnorm(seq(n)/(n + 1))
+
+qq <- data.frame(teoricos = z_i,empiricos = sort(datos2$t_i))
+
+ggplot(qq, aes(x = teoricos, y = empiricos)) +
+  geom_point() +
+  xlab('Cuantiles teoricos') +
+  ylab('Cuantiles empiricos') +
+  geom_abline(slope = 1, intercept = 0, col = 2, size = 1.5)
+
+shapiro.test(datos2$t_i) #Rechazo H0) con un alfa=0.007
 
 
-## Selección de modelo
-
-Metodo backward, el cual parte de todas las variables. 
-Con este metodo, en 3 pasos quita ls variables Ancho_cm y Longitud3,y altura_cm  para quedarse con un modelo reducido en el cual intenta explicar el peso en funcion a las variables explicativas especie, longitud2 y longitud1 
-```{r,eval=FALSE}
-datos
+ggplot(qq, aes(x = empiricos, y=..density..)) +
+  geom_histogram(breaks = seq(-3, 3, 1), col = 'white') +
+  xlab('Residuos studentizados')
+```
 
 
 
-f <- Peso_gr ~ Especie + Longitud1 + Longitud2 + Longitud3 + Altura_cm + Ancho_cm
+## Atípicos
 
+```{r}
 
-mod0 <- lm(f, data=datos)
-mod0$call[[2]]<-f
+h_i <- influence(modelo_ajustado)$hat
+D_i <- cooks.distance(modelo_ajustado)
+df <- data.frame(i = 1:nrow(datos2),
+                 h_i = h_i,
+                 D_i = D_i)
 
-length(coef(mod0))
+# Distancia de Cook
+ggplot(df, aes(x = i, y = D_i)) +
+  geom_point() +
+  geom_segment(aes(x = i, xend = i, y = 0, yend = D_i)) +
+  xlab('') +
+  ylab(expression(D[i])) +
+  geom_abline(slope = 0, intercept = 4/50, col = 2, linetype = 'dashed')
 
-modB <- backward(mod0, alpha = 0.05)
-summary(modB)
-
-
-
+#hay algún atípico pero bue....
 
 ```
+
+
+
