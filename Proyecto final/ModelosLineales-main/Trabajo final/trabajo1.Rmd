@@ -105,7 +105,9 @@ mod <- lm(Peso_gr~ ., data = datos)
 
 vif(mod) ###  Error in vif.default(mod) : there are aliased coefficients in the model  
 
+datos2 = datos %>% select(-EspecieBream) 
 
+vif(lm(Peso_gr~ ., data = datos2))
 
 ##ver
 X <- as.matrix(datos[,-1])
@@ -115,15 +117,6 @@ lambda <- eigen(t(X)%*%X)$values
 
 
 
-#Algo distinto
-
-datos = biometria_peces
-
-datos = datos %>%  mutate(Peso_gr = as.numeric(Peso_gr),Especie = as.factor(Especie)  )
-
-mod <- lm(Peso_gr~ ., data = datos)
-
-vif(mod)
 
 ```
 
@@ -141,7 +134,6 @@ datos$pred <- fitted(modelo)
 
 ggplot(datos, aes(x = pred, y = t_i)) + 
   geom_point(color = "red",alpha=0.5,size=1)+
-
   xlab('Predichos') +
   ylab('Residuos') +
  geom_abline(slope=0, intercept=c(-1,1), linetype="dashed",color="blue")+

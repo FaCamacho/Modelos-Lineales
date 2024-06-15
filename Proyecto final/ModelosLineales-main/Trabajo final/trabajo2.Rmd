@@ -67,9 +67,13 @@ summary(datos)
 ```{r}
 
 
+
+
 #Analizando multicolinealidad
 
+
 vif(lm(Peso_gr~ .-Especie, data = datos))
+
 
 #Quitando Long2
 
@@ -98,6 +102,8 @@ Para visualizar las correlaciones de las variables cuantitativas, nos creamos un
 
 modelo <- lm(Peso_gr~ Longitud1+Altura_cm+Ancho_cm, data = datos)
 
+
+
 datos$r_i <- residuals(modelo)  
 
 # residuos
@@ -112,19 +118,31 @@ datos$pred <- fitted(modelo)
 breusch_pagan(modelo) #Rechazo H0)
 
 
+ggplot(datos, aes(x = pred, y = t_i)) + 
+  geom_point(color = "red",alpha=0.5,size=1)+
+  xlab('Predichos') +
+  ylab('Residuos') +
+ geom_abline(slope=0, intercept=c(-1,1), linetype="dashed",color="blue")+
+  geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()
+
+
+
 grid.arrange(crPlot(modelo,"Longitud1")
              ,crPlot(modelo,"Altura_cm")
              ,crPlot(modelo,"Ancho_cm"),
              ncol=3,nrow=1)
 
 
-#Ajuste logarítmico
+modelo_ajustado2 <- lm(log(Peso_gr) ~ (Longitud1)+(Altura_cm)+(Ancho_cm), data = datos)
 
-modelo_ajustado <- lm(log(Peso_gr) ~ log(Longitud1)+log(Altura_cm)+log(Ancho_cm), data = datos)
+
+breusch_pagan(modelo_ajustado2)
 
 
 
 datos$r_i <- residuals(modelo_ajustado)  
+
+
 
 # residuos
 
@@ -136,12 +154,50 @@ datos$pred <- fitted(modelo_ajustado)
 breusch_pagan(modelo_ajustado) #No Rechazo H0)
 
 
+
+
 ggplot(datos, aes(x = pred, y = t_i)) + 
   geom_point(color = "red",alpha=0.5,size=1)+
   xlab('Predichos') +
   ylab('Residuos') +
  geom_abline(slope=0, intercept=c(-1,1), linetype="dashed",color="blue")+
   geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()
+
+
+#Ajuste logarítmico
+
+modelo_ajustado <- lm(log(Peso_gr) ~ log(Longitud1)+log(Altura_cm)+log(Ancho_cm), data = datos)
+
+modelo_ajustado2 <- lm(log(Peso_gr) ~ (Longitud1)+(Altura_cm)+(Ancho_cm), data = datos)
+
+
+breusch_pagan(modelo_ajustado2)
+
+
+
+datos$r_i <- residuals(modelo_ajustado)  
+
+
+
+# residuos
+
+datos$t_i <- rstudent(modelo_ajustado) #studentizados EXTERNAMENTE 
+
+datos$pred <- fitted(modelo_ajustado)
+
+
+breusch_pagan(modelo_ajustado) #No Rechazo H0)
+
+
+
+
+ggplot(datos, aes(x = pred, y = t_i)) + 
+  geom_point(color = "red",alpha=0.5,size=1)+
+  xlab('Predichos') +
+  ylab('Residuos') +
+ geom_abline(slope=0, intercept=c(-1,1), linetype="dashed",color="blue")+
+  geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()
+
 
 
 
@@ -215,6 +271,10 @@ summary(datos$Peso_gr)
 
 
 datos2 <- datos[-which.max(datos$Peso_gr),]
+
+summary(datos2$Peso_gr)
+
+datos2 <- datos2[-which.max(datos2$Peso_gr),]
 
 
 
@@ -292,6 +352,16 @@ ggplot(qq, aes(x = teoricos, y = empiricos)) +
   ylab('Cuantiles empiricos') +
   geom_abline(slope = 1, intercept = 0, col = 2, size = 1.5)
 
+
+
+# PRUEBA DE HIPOTESIS
+# H0) Los errores son normales
+# H1) Los errores NO son normales
+
+
+
+tseries::jarque.bera.test(datos2$t_i) #Rechazo H0)
+ks.test(datos2$t_i, 'pnorm') #No rechazo H0)
 shapiro.test(datos2$t_i) #Rechazo H0) con un alfa=0.007
 
 
@@ -320,7 +390,34 @@ ggplot(df, aes(x = i, y = D_i)) +
   ylab(expression(D[i])) +
   geom_abline(slope = 0, intercept = 4/50, col = 2, linetype = 'dashed')
 
+
+
+
+
 #hay algún atípico pero bue....
+
+```
+
+Graficos
+
+```{r}
+
+ggplot(datos, aes(x = Ancho_cm, y = Peso_gr, color=Especie)) + 
+  geom_point(alpha=0.5,size=2)+
+  xlab('Ancho') +
+  ylab('Peso')
+
+ggplot(datos2, aes(x = Ancho_cm, y = Peso_gr, color=Especie)) + 
+  geom_point(alpha=0.5,size=2)+
+  xlab('Ancho') +
+  ylab('Peso')
+
+
+ggplot(datos2, aes(x = Longitud1, y = Peso_gr, color=Especie)) + 
+  geom_point(alpha=0.5,size=2)+
+  xlab('Longitud') +
+  ylab('Peso')
+
 
 ```
 
