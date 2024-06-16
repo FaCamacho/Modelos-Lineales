@@ -62,30 +62,21 @@ anova(mod1)
 # segunda alternativa (tau_j = 0) #
 ##################################
 
-
-# Para cambiar el grupo de referencia, es necesario que la variable sea un factor
 datos$marca <- factor(datos$marca)
 
+modelo <- lm(km_miles ~ marca + 0, data = datos)
 
-contrasts(datos$marca) <- contr.sum(4)
-
-mod2a <- lm(km_miles ~ marca, contrasts = list(marca = 'contr.sum'),data = datos)
-
-mod2b <- lm(km_miles ~ marca, data = datos)
-
-summary(mod2a)
-summary(mod2b)
-
-anova(mod2)
+summary(modelo)
 
 
 
-
-rm(mod2)
-
+#otra cosa.....
 
 
+mod3 = lm(km_miles~ marca, contrasts = list(marca = 'contr.sum'),data = datos)
 
+summary(mod3)
+summary(mod1)
 
 
 
