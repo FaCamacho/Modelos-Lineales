@@ -31,7 +31,6 @@ library(tseries)
 ```
 
 ```{r}
-
 datos = biometria_peces
 
 #id <- seq(1,nrow(datos),1)
@@ -256,4 +255,24 @@ ggplot(datos2, aes(x = Longitud1, y = Peso_gr, color=Especie)) +
 ```
 
 
+#evaluacion de modelo 
+
+```{r}
+ bic1 = BIC(modelo)
+bic2= BIC(modelo_ajustado1)
+bic3 = BIC(modelo_ajustado2)
+aic1 = AIC(modelo)
+aic2=AIC(modelo_ajustado1)
+aic3= AIC(modelo_ajustado2)
+
+summary(modelo)$adj.r.squared
+
+summary(modelo_ajustado1)$adj.r.squared
+
+summary(modelo_ajustado2)$adj.r.squared
+
+
+
+
+```
 
