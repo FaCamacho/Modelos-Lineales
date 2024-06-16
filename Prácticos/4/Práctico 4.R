@@ -50,8 +50,6 @@ datos %>%
 mod1 <- lm(km_miles ~ marca, data = datos)
 summary(mod1)
 
-model.matrix(mod1) #Como armó la matriz con la restricción
-
 anova(mod1)
 
 # el p-valor correspondiente a la prueba es 2.781x10-8
@@ -71,14 +69,19 @@ datos$marca <- factor(datos$marca)
 
 contrasts(datos$marca) <- contr.sum(4)
 
-mod2 <- lm(km_miles ~ marca, contrasts = list(marca = 'contr.sum'),data = datos)
-summary(mod2)
+mod2a <- lm(km_miles ~ marca, contrasts = list(marca = 'contr.sum'),data = datos)
+
+mod2b <- lm(km_miles ~ marca, data = datos)
+
+summary(mod2a)
+summary(mod2b)
+
 anova(mod2)
 
 
 
 
-
+rm(mod2)
 
 
 
