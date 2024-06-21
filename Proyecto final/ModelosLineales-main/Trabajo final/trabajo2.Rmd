@@ -22,7 +22,7 @@ library(car)
 library(skedastic)
 library(qqplotr)
 library(tseries)
-
+library(emmeans)
 
 
 
@@ -250,6 +250,61 @@ summary(modelo_ajustado2)$adj.r.squared
 
 
 
+
+```
+
+## Ancova 
+
+```{r}
+## relacion entre especie y peso 
+
+
+ggplot(datos,aes(x=Especie,y=Peso_gr,fill=Especie)) + geom_boxplot()
+
+```
+
+
+
+```{r}
+
+ggplot(datos, aes(x =log(Altura_cm), y = log(Peso_gr), color=Especie)) + 
+  geom_point(alpha=0.5,size=2)+
+  xlab('Longitud1') +
+  ylab('Peso')
+```
+
+```{r}
+ggplot(datos, aes(x = log(Altura_cm), y = log(Peso_gr), col = Especie)) + 
+  geom_point() +
+  theme_bw() +
+  ylab('Precio (miles U$S)') +
+  geom_smooth(method = 'lm', se = FALSE)
+```
+Parece coexistir 7 pendientes 
+
+
+```{r}
+mod0 = lm(log(Peso_gr) ~ log(Altura_cm), data = datos)
+mod1 = lm(log(Peso_gr) ~ log(Altura_cm) + Especie, data = datos)
+
+
+anova(mod0, mod1)
+```
+Nos quedamos con el segundo modelo y nos planteamos la siguiente prueba de hipotesis. 
+Ho) la pendiente de la  Altura    es igual para las tres especies
+H1) Al menos una especie tiene un valor de la pendiente distinta a las demas.
+
+```{r}
+
+mod2 <- lm(log(Peso_gr) ~ Especie + log(Altura_cm) + log(Altura_cm):Especie, data = datos)
+
+anova(mod1, mod2)
+
+```
+```{r, eval=FALSE}
+pendientes <- emtrends(mod2, pairwise ~ Especie, var = 'log(Altura_cm)') ## no corre 
+library(multcomp)
+cld(pendientes, Letters = letters)
 
 ```
 
