@@ -47,7 +47,7 @@ str(datos)
 
 summary(datos)
 
-datos = datos %>%  mutate(Peso_gr = as.numeric(Peso_gr),Especie = as.factor(Especie) ) 
+datos = datos %>%  mutate(Peso_gr = as.numeric(Peso_gr),Especie = as.factor(Especie) )
 
 
 str(datos)
@@ -95,7 +95,7 @@ vif(lm(Peso_gr~ .-Especie-Longitud2-Longitud3, data = datos))
 
 modelo <- lm(Peso_gr~ Longitud1+Altura_cm+Ancho_cm, data = datos)
 
-modelo_ajustado1 <- lm(log(Peso_gr) ~ (Longitud1)+(Altura_cm)+(Ancho_cm), data = datos)
+modelo_ajustado <- lm(log(Peso_gr) ~ (Longitud1)+(Altura_cm)+(Ancho_cm), data = datos)
 
 modelo_ajustado2 <- lm(log(Peso_gr) ~ log(Longitud1)+log(Altura_cm)+log(Ancho_cm), data = datos)
 
@@ -206,30 +206,7 @@ ggplot(df, aes(x = i, y = D_i)) +
 
 
 
-#Sacamos los 3 más grandes
 
-```{r}
-
-
-
-summary(datos$Peso_gr)
-
-
-
-datos2 <- datos[-which.max(datos$Peso_gr),]
-
-summary(datos2$Peso_gr)
-
-datos2 <- datos2[-which.max(datos2$Peso_gr),]
-
-summary(datos2$Peso_gr)
-
-datos2 <- datos2[-which.max(datos2$Peso_gr),]
-
-summary(datos2$Peso_gr)
-
-
-```
 
 Graficos
 
@@ -259,15 +236,15 @@ ggplot(datos2, aes(x = Longitud1, y = Peso_gr, color=Especie)) +
 
 ```{r}
  bic1 = BIC(modelo)
-bic2= BIC(modelo_ajustado1)
+bic2= BIC(modelo_ajustado)
 bic3 = BIC(modelo_ajustado2)
 aic1 = AIC(modelo)
-aic2=AIC(modelo_ajustado1)
+aic2=AIC(modelo_ajustado)
 aic3= AIC(modelo_ajustado2)
 
 summary(modelo)$adj.r.squared
 
-summary(modelo_ajustado1)$adj.r.squared
+summary(modelo_ajustado)$adj.r.squared
 
 summary(modelo_ajustado2)$adj.r.squared
 
