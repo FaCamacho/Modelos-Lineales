@@ -1,0 +1,310 @@
+---
+title: "Trabajo final"
+author: "matias"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+
+library(tidyverse)
+library(readxl)
+library(here)
+library(mixlm)
+library(gridExtra)
+library(car)
+library(skedastic)
+library(qqplotr)
+library(tseries)
+library(emmeans)
+
+
+
+
+
+```
+
+```{r}
+datos = biometria_peces
+
+#id <- seq(1,nrow(datos),1)
+
+#datos <- cbind(id,datos)
+
+```
+
+## Aalisis exploratorio de los datos
+
+```{r}
+
+str(datos)
+
+summary(datos)
+
+datos = datos %>%  mutate(Peso_gr = as.numeric(Peso_gr),Especie = as.factor(Especie) )
+
+
+str(datos)
+
+summary(datos)
+
+datos <- datos %>% filter(.,Peso_gr > 0)
+
+summary(datos)
+
+
+```
+
+## Análisis de supuestos
+#Multicolinealidad
+```{r}
+
+
+
+
+#Analizando multicolinealidad
+
+
+vif(lm(Peso_gr~ .-Especie, data = datos))
+
+
+#Quitando Long2
+
+vif(lm(Peso_gr~ .-Especie-Longitud2, data = datos))
+
+#Quitando Long3
+
+vif(lm(Peso_gr~ .-Especie-Longitud2-Longitud3, data = datos))
+
+#Variables seleccionadas -> "Longitud1" , "Altura_cm" , "Ancho_cm"
+
+
+
+```
+
+##Modelos
+
+```{r}
+
+
+modelo <- lm(Peso_gr~ Longitud1+Altura_cm+Ancho_cm, data = datos)
+
+modelo_ajustado <- lm(log(Peso_gr) ~ (Longitud1)+(Altura_cm)+(Ancho_cm), data = datos)
+
+modelo_ajustado2 <- lm(log(Peso_gr) ~ log(Longitud1)+log(Altura_cm)+log(Ancho_cm), data = datos)
+
+
+```
+
+
+
+
+## Homoscedasticidad 
+
+```{r}
+
+
+
+
+
+datos$r_i <- residuals(modelo)  
+
+# residuos
+
+datos$t_i <- rstudent(modelo) #studentizados EXTERNAMENTE 
+
+datos$pred <- fitted(modelo)
+
+# H0) E(eps^2_i) = sigma^2
+# H1) E(eps^2_i) = sigma^2 * h(X_1, X_2, ..., X_k)
+
+breusch_pagan(modelo) #Rechazo H0)
+
+
+ggplot(datos, aes(x = pred, y = t_i)) + 
+  geom_point(color = "red",alpha=0.5,size=1)+
+  xlab('Predichos') +
+  ylab('Residuos') +
+ geom_abline(slope=0, intercept=c(-1,1), linetype="dashed",color="blue")+
+  geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()
+
+
+
+grid.arrange(crPlot(modelo,"Longitud1")
+             ,crPlot(modelo,"Altura_cm")
+             ,crPlot(modelo,"Ancho_cm"),
+             ncol=3,nrow=1)
+
+
+
+
+
+
+```
+
+##Normalidad
+
+```{r}
+
+n <- nrow(datos)
+
+z_i <- qnorm(seq(n)/(n + 1))
+
+qq <- data.frame(teoricos = z_i,empiricos = sort(datos$t_i))
+
+ggplot(qq, aes(x = teoricos, y = empiricos)) +
+  geom_point() +
+  xlab('Cuantiles teoricos') +
+  ylab('Cuantiles empiricos') +
+  geom_abline(slope = 1, intercept = 0, col = 2, size = 1.5)
+
+
+# PRUEBA DE HIPOTESIS
+# H0) Los errores son normales
+# H1) Los errores NO son normales
+
+
+shapiro.test(datos$t_i) #No Rechazo H0) con un alfa=0.006, medio ambiciosos capaz
+tseries::jarque.bera.test(datos$t_i) #Rechazo H0)
+ks.test(datos$t_i, 'pnorm') #No rechazo H0)
+
+ggplot(qq, aes(x = empiricos, y=..density..)) +
+  geom_histogram(breaks = seq(-3, 3, 1), col = 'white') +
+  xlab('Residuos studentizados')
+```
+
+
+
+## Atípicos
+
+```{r}
+
+h_i <- influence(modelo_ajustado)$hat
+D_i <- cooks.distance(modelo_ajustado)
+df <- data.frame(i = 1:nrow(datos),
+                 h_i = h_i,
+                 D_i = D_i)
+
+# Distancia de Cook
+ggplot(df, aes(x = i, y = D_i)) +
+  geom_point() +
+  geom_segment(aes(x = i, xend = i, y = 0, yend = D_i)) +
+  xlab('') +
+  ylab(expression(D[i])) +
+  geom_abline(slope = 0, intercept = 4/50, col = 2, linetype = 'dashed')
+
+#hay algún atípico
+
+```
+
+
+
+
+
+
+Graficos
+
+```{r}
+
+ggplot(datos, aes(x = Ancho_cm, y = Peso_gr, color=Especie)) + 
+  geom_point(alpha=0.5,size=2)+
+  xlab('Ancho') +
+  ylab('Peso')
+
+ggplot(datos2, aes(x = Ancho_cm, y = Peso_gr, color=Especie)) + 
+  geom_point(alpha=0.5,size=2)+
+  xlab('Ancho') +
+  ylab('Peso')
+
+
+ggplot(datos2, aes(x = Longitud1, y = Peso_gr, color=Especie)) + 
+  geom_point(alpha=0.5,size=2)+
+  xlab('Longitud') +
+  ylab('Peso')
+
+
+```
+
+
+#evaluacion de modelo 
+
+```{r}
+ bic1 = BIC(modelo)
+bic2= BIC(modelo_ajustado)
+bic3 = BIC(modelo_ajustado2)
+aic1 = AIC(modelo)
+aic2=AIC(modelo_ajustado)
+aic3= AIC(modelo_ajustado2)
+
+summary(modelo)$adj.r.squared
+
+summary(modelo_ajustado)$adj.r.squared
+
+summary(modelo_ajustado2)$adj.r.squared
+
+
+
+
+```
+
+## Ancova 
+
+```{r}
+## relacion entre especie y peso 
+
+
+ggplot(datos,aes(x=Especie,y=Peso_gr,fill=Especie)) + geom_boxplot()
+
+```
+
+
+
+```{r}
+
+ggplot(datos, aes(x =log(Altura_cm), y = log(Peso_gr), color=Especie)) + 
+  geom_point(alpha=0.5,size=2)+
+  xlab('Longitud1') +
+  ylab('Peso')
+```
+
+```{r}
+ggplot(datos, aes(x = log(Altura_cm), y = log(Peso_gr), col = Especie)) + 
+  geom_point() +
+  theme_bw() +
+  ylab('Precio (miles U$S)') +
+  geom_smooth(method = 'lm', se = FALSE)
+```
+Parece coexistir 7 pendientes 
+
+
+```{r}
+mod0 = lm(log(Peso_gr) ~ log(Altura_cm), data = datos)
+mod1 = lm(log(Peso_gr) ~ log(Altura_cm) + Especie, data = datos)
+
+
+anova(mod0, mod1)
+```
+Nos quedamos con el segundo modelo y nos planteamos la siguiente prueba de hipotesis. 
+Ho) la pendiente de la  Altura    es igual para las tres especies
+H1) Al menos una especie tiene un valor de la pendiente distinta a las demas.
+
+```{r}
+
+mod2.0 <- lm(log(Peso_gr) ~ Especie + log(Altura_cm) + log(Altura_cm):Especie, data = datos)
+
+anova(mod1, mod2.0)
+
+```
+```{r, eval=FALSE}
+pendientes <- emtrends(mod2, pairwise ~ Especie, var = 'log(Altura_cm)') ## no corre 
+library(multcomp)
+cld(pendientes, Letters = letters)
+
+```
+
