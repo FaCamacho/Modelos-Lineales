@@ -3,16 +3,16 @@
 # cargamos los datos del peso de los peces
 library(readxl)
 datos <- read_excel("precio.xlsx")
-datos <- precio
+datos2 <- precio
 # Nos fijamos que los datos se hayan cargado bien
 str(datos)
 
 # cambiamos la clase  de la variable 'zona'
-datos$zona <- factor(datos$zona)
+datos2$zona <- factor(datos2$zona)
 
 # indagamos sobre la relacion entre el precio y el area
 library(ggplot2)
-ggplot(datos, aes(x = area, y = precio_miles)) + 
+ggplot(datos2, aes(x = area, y = precio_miles)) + 
   geom_point() +
   theme_bw() +
   ylab('Precio (miles U$S)')
@@ -22,7 +22,7 @@ mod0 <- lm(precio_miles ~ area, data = datos)
 summary(mod0)
 
 # indaguemos sobre la relacion entre precio y zona
-ggplot(datos, aes(x = zona, y = precio_miles, fill = zona)) + 
+ggplot(datos2, aes(x = zona, y = precio_miles, fill = zona)) + 
   geom_boxplot() +
   theme_bw() +
   theme(legend.position = 'none') +
@@ -30,13 +30,13 @@ ggplot(datos, aes(x = zona, y = precio_miles, fill = zona)) +
 
 # Parece existir un 'efecto' de las zonas
 # Volvamos a realizar el diagrama de dispersion coloreando los puntos segun la zona
-ggplot(datos, aes(x = area, y = precio_miles, col = zona)) + 
+ggplot(datos2, aes(x = area, y = precio_miles, col = zona)) + 
   geom_point() +
   theme_bw() +
   ylab('Precio (miles U$S)')
 
 # parecen coexistir 3 rectas, veamos como las ajusta ggplot
-ggplot(datos, aes(x = area, y = precio_miles, col = zona)) + 
+ggplot(datos2, aes(x = area, y = precio_miles, col = zona)) + 
   geom_point() +
   theme_bw() +
   ylab('Precio (miles U$S)') +
@@ -47,7 +47,7 @@ ggplot(datos, aes(x = area, y = precio_miles, col = zona)) +
 #  2) diferente pendiente (beta_1)
 
 # especificamos el modelo con diferente valor de beta_0 para cada zona
-mod1 <- lm(precio_miles ~ zona + area, data = datos)
+mod1 <- lm(precio_miles ~ zona + area, data = datos2)
 
 # si lo comparamos con mod0 estamos realizando la prueba
 #  H0) solo existe un valor de beta_0 comun a las 3 zonas
@@ -59,8 +59,8 @@ anova(mod0, mod1)
 #  H0) la pendiente del 'area' es igual para las 3 zonas
 #  H1) al menos 1 zona tiene un valor de la pendiente diferente a las demas
 
-mod2 <- lm(precio_miles ~ zona + area + area:zona, data = datos)
-mod2 <- lm(precio_miles ~ zona*area, data = datos)
+mod2 <- lm(precio_miles ~ zona + area + area:zona, data = datos2)
+mod2 <- lm(precio_miles ~ zona*area, data = datos2)
 
 # Para llevar a cabo la prueba anterior:
 anova(mod1, mod2)

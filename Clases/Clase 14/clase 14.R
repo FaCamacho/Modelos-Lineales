@@ -139,6 +139,7 @@ sqrt((4 - 1)*qf(1-0.05,3,56))*sqrt(s2*(1/15 + 1/15))
 
 # letritas
 library(multcomp)
+library(multcompView)
 cld(cm, Letters = letters)
 cld(cm, Letters = letters, adjust = 'bonferroni')
 cld(cm, Letters = letters, adjust = 'scheffe')
@@ -171,3 +172,4 @@ shapiro.test(datos$s_i)
 
 # prueba de Kruskal-Wallis
 kruskal.test(km_miles ~ marca, data = datos)
+
