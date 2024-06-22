@@ -219,18 +219,18 @@ Graficos
 
 ```{r}
 
-ggplot(datos, aes(x = Ancho_cm, y = Peso_gr, color=Especie)) + 
+ggplot(datos, aes(x = log(Ancho_cm), y = log(Peso_gr), color=Especie)) + 
   geom_point(alpha=0.5,size=2)+
   xlab('Ancho') +
   ylab('Peso')
 
-ggplot(datos2, aes(x = Ancho_cm, y = Peso_gr, color=Especie)) + 
+ggplot(datos, aes(x = log(Ancho_cm), y = log(Peso_gr), color=Especie)) + 
   geom_point(alpha=0.5,size=2)+
   xlab('Ancho') +
   ylab('Peso')
 
 
-ggplot(datos2, aes(x = Longitud1, y = Peso_gr, color=Especie)) + 
+ggplot(datos, aes(x = log(Longitud1), y = log(Peso_gr), color=Especie)) + 
   geom_point(alpha=0.5,size=2)+
   xlab('Longitud') +
   ylab('Peso')
@@ -276,16 +276,25 @@ ggplot(datos,aes(x=Especie,y=(Peso_gr),fill=Especie)) + geom_boxplot()
 
 ggplot(datos, aes(x =log(Altura_cm), y = log(Peso_gr), color=Especie)) + 
   geom_point(alpha=0.5,size=2)+
-  xlab('Longitud1') +
+  xlab('Altura') +
   ylab('Peso')
 ```
 
 ```{r}
-ggplot(datos, aes(x = log(Altura_cm), y = log(Peso_gr), col = Especie)) + 
+alto = ggplot(datos, aes(x = log(Altura_cm), y = log(Peso_gr), col = Especie)) + 
   geom_point() +
   theme_bw() +
-  ylab('Precio (miles U$S)') +
+  ylab('Peso') +
   geom_smooth(method = 'lm', se = FALSE)
+
+ancho = ggplot(datos, aes(x = log(Ancho_cm), y = log(Peso_gr), col = Especie)) + 
+  geom_point() +
+  theme_bw() +
+  ylab('Peso') +
+  geom_smooth(method = 'lm', se = FALSE)
+
+grid.arrange(alto,ancho)
+
 ```
 Parece coexistir 7 pendientes 
 
@@ -298,20 +307,31 @@ mod1 = lm(log(Peso_gr) ~ log(Altura_cm) + Especie, data = datos)
 anova(mod0, mod1)
 ```
 Nos quedamos con el segundo modelo y nos planteamos la siguiente prueba de hipotesis. 
-Ho) la pendiente de la  Altura    es igual para las tres especies
+Ho) la pendiente de la  Altura es igual para las especies
 H1) Al menos una especie tiene un valor de la pendiente distinta a las demas.
 
 ```{r}
 
 mod2.0 <- lm(log(Peso_gr) ~ Especie + log(Altura_cm) + log(Altura_cm):Especie, data = datos)
 
+summary(mod2.0)
+
 anova(mod1, mod2.0)
 
+
 ```
+
+
+
+
+
 ```{r, eval=FALSE}
 pendientes <- emtrends(mod2.0, pairwise ~ Especie, var = 'log(Altura_cm)') ## no corre 
 library(multcomp)
 cld(pendientes, Letters = letters)
+
+
+
 
 ```
 ## Cross-Validation 
