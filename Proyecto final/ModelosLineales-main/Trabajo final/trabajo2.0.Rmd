@@ -266,7 +266,7 @@ summary(modelo_ajustado2)$adj.r.squared
 ## relacion entre especie y peso 
 
 
-ggplot(datos,aes(x=Especie,y=(Peso_gr),fill=Especie)) + geom_boxplot()
+ggplot(datos,aes(x=Especie,y=log(Peso_gr),fill=Especie)) + geom_boxplot()
 
 ```
 
@@ -293,7 +293,13 @@ ancho = ggplot(datos, aes(x = log(Ancho_cm), y = log(Peso_gr), col = Especie)) +
   ylab('Peso') +
   geom_smooth(method = 'lm', se = FALSE)
 
-grid.arrange(alto,ancho)
+longitud = ggplot(datos, aes(x = log(Longitud1), y = log(Peso_gr), col = Especie)) + 
+  geom_point() +
+  theme_bw() +
+  ylab('Peso') +
+  geom_smooth(method = 'lm', se = FALSE)
+
+grid.arrange(alto,ancho,longitud)
 
 ```
 Parece coexistir 7 pendientes 
@@ -314,6 +320,8 @@ H1) Al menos una especie tiene un valor de la pendiente distinta a las demas.
 
 mod2.0 <- lm(log(Peso_gr) ~ Especie + log(Altura_cm) + log(Altura_cm):Especie, data = datos)
 
+mod3 <- lm((Peso_gr) ~ Especie , data = datos)
+
 summary(mod2.0)
 
 anova(mod1, mod2.0)
@@ -326,12 +334,13 @@ anova(mod1, mod2.0)
 
 
 ```{r, eval=FALSE}
-pendientes <- emtrends(mod2.0, pairwise ~ Especie, var = 'log(Altura_cm)') ## no corre 
+pendientes <- emtrends(mod0, pairwise ~ Especie, var = 'log(Altura_cm)') ## no corre 
 library(multcomp)
 cld(pendientes, Letters = letters)
 
+emmeans(mod3, ~ Especie)
 
-
+summary(mod0)
 
 ```
 ## Cross-Validation 
