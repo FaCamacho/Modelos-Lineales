@@ -23,6 +23,9 @@ library(skedastic)
 library(qqplotr)
 library(tseries)
 library(emmeans)
+library(boot) 
+
+
 
 
 
@@ -95,6 +98,7 @@ vif(lm(Peso_gr~ .-Especie-Longitud2-Longitud3, data = datos))
 
 modelo <- lm(Peso_gr~ Longitud1+Altura_cm+Ancho_cm, data = datos)
 
+ summary(modelo2)
 modelo_ajustado <- lm(log(Peso_gr) ~ (Longitud1)+(Altura_cm)+(Ancho_cm), data = datos)
 
 modelo_ajustado2 <- lm(log(Peso_gr) ~ log(Longitud1)+log(Altura_cm)+log(Ancho_cm), data = datos)
@@ -305,6 +309,22 @@ anova(mod1, mod2.0)
 pendientes <- emtrends(mod2, pairwise ~ Especie, var = 'log(Altura_cm)') ## no corre 
 library(multcomp)
 cld(pendientes, Letters = letters)
+
+```
+## Cross-Validation 
+
+```{r}
+set.seed(84735)
+
+cross= prediction_summary_cv(model = modelo,  data = datos, k =10 )
+
+glm.fit <- glm(modelo, data=datos)
+
+cv.err.kfold <- cv.glm(data=datos, glmfit=glm.fit, K=10)
+cv.err.kfold$delta[1]
+ ## hacer lo mismo para los otros 2 modelos y comparar... ver la fundamentacion
+## loo()
+
 
 ```
 
