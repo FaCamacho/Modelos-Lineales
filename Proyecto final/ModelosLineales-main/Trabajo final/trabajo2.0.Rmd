@@ -66,7 +66,62 @@ summary(datos)
 
 ```
 
-## Análisis de supuestos
+
+#Análisis gráfico
+
+
+```{r}
+longitud <- ggplot(datos, aes(x = log(Longitud1), y = log(Peso_gr))) + 
+  geom_point(alpha=0.5,size=2)+
+  theme_bw() +
+  xlab('Longitud') +
+  ylab('Peso')
+
+
+ancho <- ggplot(datos, aes(x = log(Ancho_cm), y = log(Peso_gr))) + 
+  geom_point(alpha=0.5,size=2)+
+  theme_bw() +
+  xlab('Ancho') +
+  ylab('Peso')
+
+altura <- ggplot(datos, aes(x = log(Altura_cm), y = log(Peso_gr))) + 
+  geom_point(alpha=0.5,size=2)+
+  theme_bw() +
+  xlab('Alto') +
+  ylab('Peso')
+
+longitud_especie <- ggplot(datos, aes(x = log(Longitud1), y = log(Peso_gr), color=Especie)) + 
+  geom_point(alpha=0.5,size=2)+
+  theme_bw() +
+  xlab('Longitud') +
+  ylab('Peso')
+
+
+ancho_especie <- ggplot(datos, aes(x = log(Ancho_cm), y = log(Peso_gr), color=Especie)) + 
+  geom_point(alpha=0.5,size=2)+
+  theme_bw() +
+  xlab('Ancho') +
+  ylab('Peso')
+
+altura_especie <- ggplot(datos, aes(x = log(Altura_cm), y = log(Peso_gr), color=Especie)) + 
+  geom_point(alpha=0.5,size=2)+
+  theme_bw() +
+  xlab('Alto') +
+  ylab('Peso')
+
+
+
+
+
+grid.arrange(longitud_especie
+             ,ancho_especie
+             ,altura_especie,
+             ncol=1,nrow=3)
+
+```
+
+
+## Análisis de supuestos sobre modelos lineales
 #Multicolinealidad
 ```{r}
 
@@ -130,7 +185,7 @@ datos$pred <- fitted(modelo_ajustado2)
 # H0) E(eps^2_i) = sigma^2
 # H1) E(eps^2_i) = sigma^2 * h(X_1, X_2, ..., X_k)
 
-breusch_pagan(modelo_ajustado2) #No Rechazo H0)
+breusch_pagan(modelo_ajustado2) #No Rechazo H0) con p-valor de 0.8
 
 
 ggplot(datos, aes(x = pred, y = t_i)) + 
