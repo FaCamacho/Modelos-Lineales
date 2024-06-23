@@ -264,7 +264,7 @@ ggplot(df, aes(x = i, y = D_i)) +
   ylab(expression(D[i])) +
   geom_abline(slope = 0, intercept = 4/50, col = 2, linetype = 'dashed')
 
-#hay algún atípico
+#hay algún atípico 
 
 ```
 
