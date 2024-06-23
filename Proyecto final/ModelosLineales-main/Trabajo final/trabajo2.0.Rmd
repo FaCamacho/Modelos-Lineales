@@ -60,6 +60,10 @@ datos <- datos %>% filter(.,Peso_gr > 0)
 
 summary(datos) #Deberíamos quitar el de 5.9 gr
 
+datos <- datos %>% filter(.,Peso_gr > 5.9)
+
+summary(datos)
+
 
 ```
 
@@ -182,7 +186,7 @@ datos$pred <- fitted(modelo_ajustado2)
 
 
 
-breusch_pagan(modelo_ajustado2) #No Rechazo H0) con p-valor de 0.8
+breusch_pagan(modelo_ajustado2) #No Rechazo H0) con p-valor de 0.73
 
 
 ggplot(datos, aes(x = pred, y = t_i)) + 
@@ -225,9 +229,9 @@ ggplot(qq, aes(x = teoricos, y = empiricos)) +
 # H1) Los errores NO son normales
 
 
-shapiro.test(datos$t_i) #Rechazo H0) con un alfa=0.006, medio ambiciosos capaz
-tseries::jarque.bera.test(datos$t_i) #Rechazo H0)
-ks.test(datos$t_i, 'pnorm') #No Rechazo H0)
+shapiro.test(datos$t_i) #Rechazo H0) con un p-valor de 0.0049
+tseries::jarque.bera.test(datos$t_i) #Rechazo H0) con un p-valor de 1.794e-05
+ks.test(datos$t_i, 'pnorm') #No Rechazo H0) con un p-valor de 0.5317
 
 ggplot(qq, aes(x = empiricos, y=..density..)) +
   geom_histogram(breaks = seq(-3, 3, 1), col = 'white') +
@@ -259,12 +263,6 @@ ggplot(df, aes(x = i, y = D_i)) +
 ```
 
 
-
-
-
-
-
-
 #evaluacion de modelo 
 
 ```{r}
@@ -293,10 +291,12 @@ summary(modelo_ajustado2)$adj.r.squared
 
 datos_especie <- datos %>%
   group_by(Especie) %>%
-  summarise(media = round(mean(Peso_gr),2),
-            desvio = round(sd(Peso_gr),2),
-            min=round(min(Peso_gr),2),
-            max=round(max(Peso_gr),2))
+  summarise("media(peso)" = round(mean(Peso_gr),2),
+            "desvio(peso)" = round(sd(Peso_gr),2),
+            "min(peso)"=round(min(Peso_gr),2),
+            "max(peso)"=round(max(Peso_gr),2))
+
+datos_especie
 
 
 
@@ -322,7 +322,7 @@ mod0 <- lm(Peso_gr ~ Longitud1 + Ancho_cm + Altura_cm , data = datos) #Sin espec
 
 Anova(mod1, mod0)
 
-#Con un p-valor de 3.239e-13 la especie es significativa para el modelo
+#Con un p-valor de 4.705e-16 la especie es significativa para el modelo
 
 
 
