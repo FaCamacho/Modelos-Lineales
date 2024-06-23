@@ -342,11 +342,16 @@ summary(lm((Peso_gr) ~ Especie + 0, data = datos))
 #Por ejemplo, para los Bream estamos en el primer caso mientras que para los Smelt en el segundo
 
 
-ggplot(datos, aes(x = log(Peso_gr), y = log(Longitud1), col = Especie)) +
+ggplot(datos,aes(x=Especie,y=log(Peso_gr),fill=Especie)) + geom_boxplot() +xlab('Peso') + 
+  ylab('Longitud')
+
+ggplot(datos, aes(x = log(Peso_gr), y = log(Longitud1), fill = Especie)) +
   geom_boxplot() +
   xlab('Peso') + 
   ylab('Longitud') +
   theme_bw()
+
+
 
 ```
 
