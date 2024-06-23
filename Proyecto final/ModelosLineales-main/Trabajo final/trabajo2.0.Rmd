@@ -111,7 +111,7 @@ modelo_ajustado2 <- lm(log(Peso_gr) ~ log(Longitud1)+log(Altura_cm)+log(Ancho_cm
 
 
 
-## Homoscedasticidad 
+## Homoscedasticidad de "Modelo_ajustado2"
 
 ```{r}
 
@@ -177,8 +177,8 @@ ggplot(qq, aes(x = teoricos, y = empiricos)) +
 
 
 shapiro.test(datos$t_i) #Rechazo H0) con un alfa=0.006, medio ambiciosos capaz
-tseries::jarque.bera.test(datos$t_i) #No Rechazo H0)
-ks.test(datos$t_i, 'pnorm') #Rechazo H0)
+tseries::jarque.bera.test(datos$t_i) #Rechazo H0)
+ks.test(datos$t_i, 'pnorm') #No Rechazo H0)
 
 ggplot(qq, aes(x = empiricos, y=..density..)) +
   geom_histogram(breaks = seq(-3, 3, 1), col = 'white') +
