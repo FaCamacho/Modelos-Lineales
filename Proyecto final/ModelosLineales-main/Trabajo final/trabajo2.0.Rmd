@@ -34,13 +34,10 @@ library(boot)
 ```
 
 ```{r}
-
+#Cargar los datos
 
 datos = biometria_peces
 
-#id <- seq(1,nrow(datos),1)
-
-#datos <- cbind(id,datos)
 
 ```
 
@@ -52,16 +49,16 @@ str(datos)
 
 summary(datos)
 
-datos = datos %>%  mutate(Peso_gr = as.numeric(Peso_gr),Especie = as.factor(Especie) )
+datos = datos %>%  mutate(Peso_gr = as.numeric(Peso_gr),Especie = as.factor(Especie) ) 
 
 
 str(datos)
 
-summary(datos)
+summary(datos) #Hay un pez con peso 0 gr
 
 datos <- datos %>% filter(.,Peso_gr > 0)
 
-summary(datos)
+summary(datos) #Deberíamos quitar el de 5.9 gr
 
 
 ```
@@ -150,7 +147,7 @@ vif(lm(Peso_gr~ .-Especie-Longitud2-Longitud3, data = datos))
 ##Modelos
 
 ```{r}
- #Ir agregando de forma paulatina cada variable
+
 
 modelo <- lm(Peso_gr~ Longitud1+Altura_cm+Ancho_cm, data = datos)
 
@@ -171,10 +168,6 @@ modelo_ajustado2 <- lm(log(Peso_gr) ~ log(Longitud1)+log(Altura_cm)+log(Ancho_cm
 ## Homoscedasticidad de "Modelo_ajustado2"
 
 ```{r}
-
-
-
-
 
 datos$r_i <- residuals(modelo_ajustado2)  
 
@@ -201,12 +194,9 @@ ggplot(datos, aes(x = pred, y = t_i)) +
 
 
 
-grid.arrange(crPlot(modelo,"Longitud1")
-             ,crPlot(modelo,"Altura_cm")
-             ,crPlot(modelo,"Ancho_cm"),
-             ncol=3,nrow=1)
+#grid.arrange(crPlot(modelo,"Longitud1"),crPlot(modelo,"Altura_cm"),crPlot(modelo,"Ancho_cm"),ncol=3,nrow=1)
 
-
+plot(modelo_ajustado2)
 
 
 
@@ -250,8 +240,8 @@ ggplot(qq, aes(x = empiricos, y=..density..)) +
 
 ```{r}
 
-h_i <- influence(modelo_ajustado)$hat
-D_i <- cooks.distance(modelo_ajustado)
+h_i <- influence(modelo_ajustado2)$hat
+D_i <- cooks.distance(modelo_ajustado2)
 df <- data.frame(i = 1:nrow(datos),
                  h_i = h_i,
                  D_i = D_i)
