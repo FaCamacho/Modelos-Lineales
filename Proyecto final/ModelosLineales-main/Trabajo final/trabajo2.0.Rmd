@@ -315,14 +315,14 @@ anova(mod0, mod1)
 
 #Ahora con el modelo completo
 
-mod1 <- lm(Peso_gr ~ log(Longitud1) + Ancho_cm + Altura_cm + Especie, data = datos) #Con especie
+mod1 <- lm(log(Peso_gr) ~ log(Longitud1) + log(Ancho_cm) + log(Altura_cm) + Especie, data = datos) #Con especie
 
 
-mod0 <- lm(Peso_gr ~ Longitud1 + Ancho_cm + Altura_cm , data = datos) #Sin especie
+mod0 <- lm(log(Peso_gr) ~ log(Longitud1) + log(Ancho_cm) + log(Altura_cm) , data = datos) #Sin especie
 
 Anova(mod1, mod0)
 
-#Con un p-valor de 4.705e-16 la especie es significativa para el modelo
+#Con un p-valor de 2.655e-06 la especie es significativa para el modelo
 
 
 
@@ -370,7 +370,7 @@ datos$pred <- fitted(mod1)
 # H0) E(eps^2_i) = sigma^2
 # H1) E(eps^2_i) = sigma^2 * h(X_1, X_2, ..., X_k)
 
-breusch_pagan(mod1) #No Rechazo H0)
+breusch_pagan(mod1) #No Rechazo H0) con p-valor 0.92
 
 # Normalidad
 
@@ -392,9 +392,9 @@ ggplot(qq, aes(x = teoricos, y = empiricos)) +
 # H1) Los errores NO son normales
 
 
-shapiro.test(datos$t_i) #Rechazo H0)
-tseries::jarque.bera.test(datos$t_i) #Rechazo H0)
-ks.test(datos$t_i, 'pnorm') #No Rechazo H0)
+shapiro.test(datos$t_i) #Rechazo H0) con p-value = 0.001005
+tseries::jarque.bera.test(datos$t_i) #Rechazo H0) con p-value = 4.169e-09
+ks.test(datos$t_i, 'pnorm') #No Rechazo H0) con p-value = 0.8776
 
 ggplot(qq, aes(x = empiricos, y=..density..)) +
   geom_histogram(breaks = seq(-3, 3, 1), col = 'white') +
@@ -448,7 +448,7 @@ ggplot(datos, aes(x = log(Peso_gr), y = log(Longitud1), col = Especie)) +
 
 ```{r}
 
-#Modelo con Covariable  ancho
+#Modelo con Covariable ANCHO
 
 mod3 <- lm(log(Peso_gr) ~ log(Ancho_cm) + Especie  , data = datos)
 
@@ -456,11 +456,11 @@ mod3 <- lm(log(Peso_gr) ~ log(Ancho_cm) + Especie  , data = datos)
 
 #Linealidad
 
-with(datos,cor(Peso_gr,Ancho_cm))
+with(datos,cor(Peso_gr,Ancho_cm)) #Correlacion debil de 0.14
 
 plot(log(datos$Peso_gr), log(datos$Ancho_cm))
 
-plot(lm(lm(log(Peso_gr) ~ log(Ancho_cm)  , data = datos)))
+# plot(lm(lm(log(Peso_gr) ~ log(Ancho_cm)  , data = datos)))
 
 #Homosedasticidad
 
@@ -475,7 +475,7 @@ datos$pred <- fitted(mod3)
 # H0) E(eps^2_i) = sigma^2
 # H1) E(eps^2_i) = sigma^2 * h(X_1, X_2, ..., X_k)
 
-breusch_pagan(mod3) # No Rechazo H0) con alfa menor a 0.068
+breusch_pagan(mod3) #Rechazo H0) con p-valor 0.0001425355
 
 # Normalidad
 
@@ -497,9 +497,9 @@ ggplot(qq, aes(x = teoricos, y = empiricos)) +
 # H1) Los errores NO son normales
 
 
-shapiro.test(datos$t_i) #Rechazo H0)
-tseries::jarque.bera.test(datos$t_i) #Rechazo H0)
-ks.test(datos$t_i, 'pnorm') #No Rechazo H0)
+shapiro.test(datos$t_i) #No echazo H0) p-value = 0.5116
+tseries::jarque.bera.test(datos$t_i) #No Rechazo H0) p-value = 0.916
+ks.test(datos$t_i, 'pnorm') #No Rechazo H0) 0.8489
 
 ggplot(qq, aes(x = empiricos, y=..density..)) +
   geom_histogram(breaks = seq(-3, 3, 1), col = 'white') +
@@ -510,10 +510,10 @@ ggplot(qq, aes(x = empiricos, y=..density..)) +
 ## Supuesto de correlación
 
 with(datos,cor(Peso_gr,Ancho_cm))
-# Correlacion debil de 0.13
+# Correlacion debil de 0.14
 
 
-crPlot(mod3, variable = 'Ancho_cm', pch = 16)
+crPlot(mod3, variable = 'log(Ancho_cm)', pch = 16)
 
 # Supuesto igualdad de pendientes
 mod4 <- lm(Peso_gr~ Ancho_cm + Especie + Ancho_cm:Especie, data = datos)
@@ -521,13 +521,13 @@ mod4 <- lm(Peso_gr~ Ancho_cm + Especie + Ancho_cm:Especie, data = datos)
 #H0) b1 = b2 = ... = bJ
 #H1) No H0)
 
-anova(mod3, mod4) #No rechazo H0)
+anova(mod3, mod4) #Rechazo H0)
 
 # Supuesto la covariable NO afecta la media de cada especie
 anova(lm(Ancho_cm ~ Especie, data = datos))
 
 #p-valor : < 2.2e-16
-# Rechazo el supuesto de que la covariable NO afecta la medida de cada especie
+# Rechazo el supuesto de que la covariable Ancho NO afecta la medida de cada especie
 
 
 
@@ -546,54 +546,113 @@ ggplot(datos, aes(x = Peso_gr, y = Ancho_cm, col = Especie)) +
 ```
 
 
+
 ```{r}
 
-#Analisis de covarianza
+#Modelo con Covariable ALTURA
+
+mod5 <- lm(log(Peso_gr) ~ log(Altura_cm) + Especie  , data = datos)
+
+###Supuestos de modelos lineales
+
+#Linealidad
+
+with(datos,cor(Peso_gr,Altura_cm)) #Correlacion debil de 0.19
+
+plot(log(datos$Peso_gr), log(datos$Altura_cm))
 
 
-ggplot(datos2,aes(x=Especie,y=(Peso_gr),fill=Especie)) + geom_boxplot()
+#Homosedasticidad
 
-Anova(mod1)
-#Tanto longitud como especie son variables que determinan el peso. Vemos un valor de significación alto tanto para
-#la variable explicativa "Especie" como para su covaraible "Longitud"
+datos$r_i <- residuals(mod5)  
+
+# residuos
+
+datos$t_i <- rstudent(mod5) #studentizados EXTERNAMENTE 
+
+datos$pred <- fitted(mod5)
+
+# H0) E(eps^2_i) = sigma^2
+# H1) E(eps^2_i) = sigma^2 * h(X_1, X_2, ..., X_k)
+
+breusch_pagan(mod5) #Rechazo H0) con p-valor 3.463588e-05
+
+# Normalidad
+
+n <- nrow(datos)
+
+z_i <- qnorm(seq(n)/(n + 1))
+
+qq <- data.frame(teoricos = z_i,empiricos = sort(datos$t_i))
+
+ggplot(qq, aes(x = teoricos, y = empiricos)) +
+  geom_point() +
+  xlab('Cuantiles teoricos') +
+  ylab('Cuantiles empiricos') +
+  geom_abline(slope = 1, intercept = 0, col = 2, size = 1.5)
 
 
-summary(mod1)$sigma #desvio de los errores
-summary(mod2)$sigma
+# PRUEBA DE HIPOTESIS
+# H0) Los errores son normales
+# H1) Los errores NO son normales
+
+
+shapiro.test(datos$t_i) #No rechazo H0) p-value = 0.2278
+tseries::jarque.bera.test(datos$t_i) #No Rechazo H0) p-value = 0.7418
+ks.test(datos$t_i, 'pnorm') #No Rechazo H0) 0.7212
+
+ggplot(qq, aes(x = empiricos, y=..density..)) +
+  geom_histogram(breaks = seq(-3, 3, 1), col = 'white') +
+  xlab('Residuos studentizados')
+
+###Supuestos de ANCOVA
+
+## Supuesto de correlación
+
+with(datos,cor(Peso_gr,Altura_cm))
+# Correlacion debil de 0.19
+
+
+crPlot(mod5, variable = 'log(Altura_cm)', pch = 16)
+
+# Supuesto igualdad de pendientes
+mod6 <- lm(Peso_gr~ Altura_cm + Especie + Altura_cm:Especie, data = datos)
+
+#H0) b1 = b2 = ... = bJ
+#H1) No H0)
+
+anova(mod5, mod6) #Rechazo H0)
+
+# Supuesto la covariable NO afecta la media de cada especie
+anova(lm(Altura_cm ~ Especie, data = datos))
+
+#p-valor : < 2.2e-16
+# Rechazo el supuesto de que la covariable Altura NO afecta la medida de cada especie
+
+
+
+ggplot(datos, aes(x = Peso_gr, y = Altura_cm, col = Especie)) +
+  geom_point() +
+  xlab('Peso') + 
+  ylab('Altura') +
+  theme_bw()+
+  geom_smooth(method = 'lm', se =FALSE)
+
+#Aquí vemos rectas lineales, con distintas pendientes y dispersión concentrada en las rectas de regresión lineal en varios casos.
+# Altura Podría ser una buena covariable para el peso de los peces
+
+
 
 
 ```
 
 
 
-```{r}
-
-ancho <- ggplot(datos, aes(x = log(Ancho_cm), y = log(Peso_gr), color=Especie)) + 
-  geom_point(alpha=0.5,size=2)+
-  theme_bw() +
-  xlab('Ancho') +
-  ylab('Peso')
-
-altura <- ggplot(datos, aes(x = log(Altura_cm), y = log(Peso_gr), color=Especie)) + 
-  geom_point(alpha=0.5,size=2)+
-  theme_bw() +
-  xlab('Alto') +
-  ylab('Peso')
 
 
-longitud <- ggplot(datos, aes(x = log(Longitud1), y = log(Peso_gr), color=Especie)) + 
-  geom_point(alpha=0.5,size=2)+
-  theme_bw() +
-  xlab('Longitud') +
-  ylab('Peso')
 
 
-grid.arrange(ancho
-             ,altura
-             ,longitud,
-             ncol=1,nrow=3)
 
-```
 
 
 Parece coexistir 7 pendientes 
