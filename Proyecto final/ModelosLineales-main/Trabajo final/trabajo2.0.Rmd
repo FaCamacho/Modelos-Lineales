@@ -214,9 +214,6 @@ ggplot(df, aes(x = i, y = D_i)) +
 
 
 
-Graficos
-
-
 
 
 #evaluacion de modelo 
@@ -244,27 +241,17 @@ summary(modelo_ajustado2)$adj.r.squared
 
 ```{r}
 
-datos2 = biometria_peces
 
-datos2 = datos2 %>%  mutate(Peso_gr = as.numeric(Peso_gr),Especie = as.factor(Especie) )
-
-
-str(datos2)
-
-summary(datos2)
-
-datos2 <- datos2 %>% filter(.,Peso_gr > 0)
-
-datos_especie <- datos2 %>%
+datos_especie <- datos %>%
   group_by(Especie) %>%
   summarise(media = round(mean(Peso_gr),2),
             desvio = round(sd(Peso_gr),2))
 
 
 
-mod1 <- lm(Peso_gr ~ Especie, data = datos2) #Modelo con "Peso ~ Especie"
+mod1 <- lm(Peso_gr ~ Especie, data = datos) #Modelo con "Peso ~ Especie"
 
-mod0 <- lm(Peso_gr ~ 1, data = datos2) #Modelo con "Peso ~ 1"
+mod0 <- lm(Peso_gr ~ 1, data = datos) #Modelo con "Peso ~ 1"
 
 anova(mod0, mod1)
 
@@ -275,7 +262,7 @@ anova(mod0, mod1)
 # Rechazamos H0) y afirmamos que la especie es relevante para determinar el peso de un pez
 
 
-summary(lm((Peso_gr) ~ Especie + 0, data = datos2))
+summary(lm((Peso_gr) ~ Especie + 0, data = datos))
 
 #Vemos que para algunos peces la especie es relevante para determinar el peso mientras que para otras no
 #Por ejemplo, para los Bream estamos en el primer caso mientras que para los Smelt en el segundo
@@ -293,19 +280,19 @@ summary(lm((Peso_gr) ~ Especie + 0, data = datos2))
 
 #Modelo con Covariable Longitud
 
-mod1 <- lm(log(Peso_gr) ~ log(Longitud1) + Especie, data = datos2)
+mod1 <- lm(log(Peso_gr) ~ log(Longitud1) + Especie, data = datos)
 
 ###Supuestos de linealidad
 
 #Homosedasticidad
 
-datos2$r_i <- residuals(mod1)  
+datos$r_i <- residuals(mod1)  
 
 # residuos
 
-datos2$t_i <- rstudent(mod1) #studentizados EXTERNAMENTE 
+datos$t_i <- rstudent(mod1) #studentizados EXTERNAMENTE 
 
-datos2$pred <- fitted(mod1)
+datos$pred <- fitted(mod1)
 
 # H0) E(eps^2_i) = sigma^2
 # H1) E(eps^2_i) = sigma^2 * h(X_1, X_2, ..., X_k)
@@ -314,11 +301,11 @@ breusch_pagan(mod1) #No Rechazo H0)
 
 # Normalidad
 
-n <- nrow(datos2)
+n <- nrow(datos)
 
 z_i <- qnorm(seq(n)/(n + 1))
 
-qq <- data.frame(teoricos = z_i,empiricos = sort(datos2$t_i))
+qq <- data.frame(teoricos = z_i,empiricos = sort(datos$t_i))
 
 ggplot(qq, aes(x = teoricos, y = empiricos)) +
   geom_point() +
@@ -332,9 +319,9 @@ ggplot(qq, aes(x = teoricos, y = empiricos)) +
 # H1) Los errores NO son normales
 
 
-shapiro.test(datos2$t_i) #Rechazo H0)
-tseries::jarque.bera.test(datos2$t_i) #Rechazo H0)
-ks.test(datos2$t_i, 'pnorm') #No Rechazo H0)
+shapiro.test(datos$t_i) #Rechazo H0)
+tseries::jarque.bera.test(datos$t_i) #Rechazo H0)
+ks.test(datos$t_i, 'pnorm') #No Rechazo H0)
 
 ggplot(qq, aes(x = empiricos, y=..density..)) +
   geom_histogram(breaks = seq(-3, 3, 1), col = 'white') +
@@ -346,14 +333,14 @@ ggplot(qq, aes(x = empiricos, y=..density..)) +
 
 ## Supuesto de correlación
 
-with(datos2,cor(Peso_gr,Longitud1))
+with(datos,cor(Peso_gr,Longitud1))
 # Correlacion fuerte de 0.92
 
 
 crPlot(mod1, variable = 'log(Longitud1)', pch = 16)
 
 # Supuesto igualdad de pendientes
-mod2 <- lm(log(Peso_gr)~ log(Longitud1) + Especie + log(Longitud1):Especie, data = datos2)
+mod2 <- lm(log(Peso_gr)~ log(Longitud1) + Especie + log(Longitud1):Especie, data = datos)
 
 #H0) b1 = b2 = ... = bJ
 #H1) No H0)
@@ -361,14 +348,14 @@ mod2 <- lm(log(Peso_gr)~ log(Longitud1) + Especie + log(Longitud1):Especie, data
 anova(mod1, mod2) #No Rechazo H0)
 
 # Supuesto la covariable NO afecta la media de cada especie
-anova(lm(log(Longitud1) ~ Especie, data = datos2))
+anova(lm(log(Longitud1) ~ Especie, data = datos))
 
 #p-valor : < 2.2e-16
 # Rechazo el supuesto de que la covariable NO afecta la medida de cada especie
 
 
 
-ggplot(datos2, aes(x = log(Peso_gr), y = log(Longitud1), col = Especie)) +
+ggplot(datos, aes(x = log(Peso_gr), y = log(Longitud1), col = Especie)) +
   geom_point() +
   xlab('Peso') + 
   ylab('Longitud') +
@@ -390,27 +377,27 @@ ggplot(datos2, aes(x = log(Peso_gr), y = log(Longitud1), col = Especie)) +
 
 #Modelo con Covariable  ancho
 
-mod3 <- lm(log(Peso_gr) ~ log(Ancho_cm) + Especie  , data = datos2)
+mod3 <- lm(log(Peso_gr) ~ log(Ancho_cm) + Especie  , data = datos)
 
 ###Supuestos de modelos lineales
 
 #Linealidad
 
-with(datos2,cor(Peso_gr,Ancho_cm))
+with(datos,cor(Peso_gr,Ancho_cm))
 
-plot(log(datos2$Peso_gr), log(datos2$Ancho_cm))
+plot(log(datos$Peso_gr), log(datos$Ancho_cm))
 
-plot(lm(lm(log(Peso_gr) ~ log(Ancho_cm)  , data = datos2)))
+plot(lm(lm(log(Peso_gr) ~ log(Ancho_cm)  , data = datos)))
 
 #Homosedasticidad
 
-datos2$r_i <- residuals(mod3)  
+datos$r_i <- residuals(mod3)  
 
 # residuos
 
-datos2$t_i <- rstudent(mod3) #studentizados EXTERNAMENTE 
+datos$t_i <- rstudent(mod3) #studentizados EXTERNAMENTE 
 
-datos2$pred <- fitted(mod3)
+datos$pred <- fitted(mod3)
 
 # H0) E(eps^2_i) = sigma^2
 # H1) E(eps^2_i) = sigma^2 * h(X_1, X_2, ..., X_k)
@@ -419,11 +406,11 @@ breusch_pagan(mod3) # No Rechazo H0) con alfa menor a 0.068
 
 # Normalidad
 
-n <- nrow(datos2)
+n <- nrow(datos)
 
 z_i <- qnorm(seq(n)/(n + 1))
 
-qq <- data.frame(teoricos = z_i,empiricos = sort(datos2$t_i))
+qq <- data.frame(teoricos = z_i,empiricos = sort(datos$t_i))
 
 ggplot(qq, aes(x = teoricos, y = empiricos)) +
   geom_point() +
@@ -437,9 +424,9 @@ ggplot(qq, aes(x = teoricos, y = empiricos)) +
 # H1) Los errores NO son normales
 
 
-shapiro.test(datos2$t_i) #Rechazo H0)
-tseries::jarque.bera.test(datos2$t_i) #Rechazo H0)
-ks.test(datos2$t_i, 'pnorm') #No Rechazo H0)
+shapiro.test(datos$t_i) #Rechazo H0)
+tseries::jarque.bera.test(datos$t_i) #Rechazo H0)
+ks.test(datos$t_i, 'pnorm') #No Rechazo H0)
 
 ggplot(qq, aes(x = empiricos, y=..density..)) +
   geom_histogram(breaks = seq(-3, 3, 1), col = 'white') +
@@ -449,14 +436,14 @@ ggplot(qq, aes(x = empiricos, y=..density..)) +
 
 ## Supuesto de correlación
 
-with(datos2,cor(Peso_gr,Ancho_cm))
+with(datos,cor(Peso_gr,Ancho_cm))
 # Correlacion debil de 0.13
 
 
 crPlot(mod3, variable = 'Ancho_cm', pch = 16)
 
 # Supuesto igualdad de pendientes
-mod4 <- lm(Peso_gr~ Ancho_cm + Especie + Ancho_cm:Especie, data = datos2)
+mod4 <- lm(Peso_gr~ Ancho_cm + Especie + Ancho_cm:Especie, data = datos)
 
 #H0) b1 = b2 = ... = bJ
 #H1) No H0)
@@ -464,14 +451,14 @@ mod4 <- lm(Peso_gr~ Ancho_cm + Especie + Ancho_cm:Especie, data = datos2)
 anova(mod3, mod4) #No rechazo H0)
 
 # Supuesto la covariable NO afecta la media de cada especie
-anova(lm(Ancho_cm ~ Especie, data = datos2))
+anova(lm(Ancho_cm ~ Especie, data = datos))
 
 #p-valor : < 2.2e-16
 # Rechazo el supuesto de que la covariable NO afecta la medida de cada especie
 
 
 
-ggplot(datos2, aes(x = Peso_gr, y = Ancho_cm, col = Especie)) +
+ggplot(datos, aes(x = Peso_gr, y = Ancho_cm, col = Especie)) +
   geom_point() +
   xlab('Peso') + 
   ylab('Ancho') +
