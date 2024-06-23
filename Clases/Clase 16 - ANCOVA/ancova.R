@@ -43,9 +43,9 @@ ggplot(datos, aes(x = nota_i, y = nota_f, col = grupo)) +
 
 # Ajustemos en primer lugar el modelo ANOVA a 1 via
 mod1 <- lm(nota_f ~ grupo, data = datos)
-# significacion del modelo = 
-# significacion del factor ('grupo') =
-# significacion de la prueba de igualdad de medias
+# significacion del modelo = 0.1858
+# significacion del factor ('grupo') = 0.1858
+# significacion de la prueba de igualdad de medias = 0.1858
 anova(mod1)
 
 # no parece haber diferencias entre las calificaciones finales de los grupos

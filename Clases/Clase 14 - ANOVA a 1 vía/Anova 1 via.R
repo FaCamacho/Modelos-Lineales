@@ -3,7 +3,7 @@
 # cargamos los datos de la vida util de los neumaticos
 library(readxl)
 datos <- read_excel("anova_1_via.xlsx")
-
+datos= anova_1_via
 datos <- as.data.frame(datos)
 # En primer lugar corroboramos que los datos hayan sido cargados adecuadamente
 str(datos)
