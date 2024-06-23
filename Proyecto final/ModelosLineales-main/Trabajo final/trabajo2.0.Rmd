@@ -71,6 +71,8 @@ summary(datos)
 
 
 ```{r}
+
+
 longitud <- ggplot(datos, aes(x = log(Longitud1), y = log(Peso_gr))) + 
   geom_point(alpha=0.5,size=2)+
   theme_bw() +
@@ -148,7 +150,7 @@ vif(lm(Peso_gr~ .-Especie-Longitud2-Longitud3, data = datos))
 ##Modelos
 
 ```{r}
-
+ #Ir agregando de forma paulatina cada variable
 
 modelo <- lm(Peso_gr~ Longitud1+Altura_cm+Ancho_cm, data = datos)
 
@@ -184,6 +186,8 @@ datos$pred <- fitted(modelo_ajustado2)
 
 # H0) E(eps^2_i) = sigma^2
 # H1) E(eps^2_i) = sigma^2 * h(X_1, X_2, ..., X_k)
+
+
 
 breusch_pagan(modelo_ajustado2) #No Rechazo H0) con p-valor de 0.8
 
@@ -300,21 +304,36 @@ summary(modelo_ajustado2)$adj.r.squared
 datos_especie <- datos %>%
   group_by(Especie) %>%
   summarise(media = round(mean(Peso_gr),2),
-            desvio = round(sd(Peso_gr),2))
+            desvio = round(sd(Peso_gr),2),
+            min=round(min(Peso_gr),2),
+            max=round(max(Peso_gr),2))
 
 
 
-mod1 <- lm(Peso_gr ~ Especie, data = datos) #Modelo con "Peso ~ Especie"
+mod1 <- lm(log(Peso_gr) ~ Especie, data = datos) #Modelo con "Peso ~ Especie"
 
-mod0 <- lm(Peso_gr ~ 1, data = datos) #Modelo con "Peso ~ 1"
+mod0 <- lm(log(Peso_gr) ~ 1, data = datos) #Modelo con "Peso ~ 1"
 
 anova(mod0, mod1)
 
 #H0) m1 = m2 = ... = mJ
 #H1) No H0)
 
-#p-value: 4.058e-13 de la prueba de significación global
+#p-value: 2.2e-16 de la prueba de significación global
 # Rechazamos H0) y afirmamos que la especie es relevante para determinar el peso de un pez
+
+
+#Ahora con el modelo completo
+
+mod1 <- lm(Peso_gr ~ log(Longitud1) + Ancho_cm + Altura_cm + Especie, data = datos) #Con especie
+
+
+mod0 <- lm(Peso_gr ~ Longitud1 + Ancho_cm + Altura_cm , data = datos) #Sin especie
+
+Anova(mod1, mod0)
+
+#Con un p-valor de 3.239e-13 la especie es significativa para el modelo
+
 
 
 summary(lm((Peso_gr) ~ Especie + 0, data = datos))
@@ -323,7 +342,11 @@ summary(lm((Peso_gr) ~ Especie + 0, data = datos))
 #Por ejemplo, para los Bream estamos en el primer caso mientras que para los Smelt en el segundo
 
 
-
+ggplot(datos, aes(x = log(Peso_gr), y = log(Longitud1), col = Especie)) +
+  geom_boxplot() +
+  xlab('Peso') + 
+  ylab('Longitud') +
+  theme_bw()
 
 ```
 
@@ -577,31 +600,7 @@ grid.arrange(ancho
 
 ```
 
-```{r}
-alto = ggplot(datos, aes(x = log(Altura_cm), y = log(Peso_gr), col = Especie)) + 
-  geom_point(alpha=0.5,size=2) +
-  theme_bw() +
-  ylab('Peso') +
-  xlab('Alto') +
-  geom_smooth(method = 'lm', se = FALSE)
 
-ancho = ggplot(datos, aes(x = log(Ancho_cm), y = log(Peso_gr), col = Especie)) + 
-  geom_point(alpha=0.5,size=2) +
-  theme_bw() +
-  ylab('Peso') +
-  xlab('Ancho') 
-  geom_smooth(method = 'lm', se = FALSE)
-
-longitud = ggplot(datos, aes(x = log(Longitud1), y = log(Peso_gr), col = Especie)) + 
-  geom_point(alpha=0.5,size=2) +
-  theme_bw() +
-  ylab('Peso') +
-  xlab('Longitud') +
-  geom_smooth(method = 'lm', se = FALSE)
-
-grid.arrange(ancho,alto,longitud)
-
-```
 Parece coexistir 7 pendientes 
 
 
