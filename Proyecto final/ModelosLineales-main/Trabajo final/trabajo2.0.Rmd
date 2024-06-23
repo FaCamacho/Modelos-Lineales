@@ -270,7 +270,7 @@ ggplot(datos,aes(x=Especie,y=Peso_gr,fill=Especie)) + geom_boxplot()
 
 
 ```{r}
-
+library(tidyverse)
 ggplot(datos, aes(x =log(Altura_cm), y = log(Peso_gr), color=Especie)) + 
   geom_point(alpha=0.5,size=2)+
   xlab('Longitud1') +
@@ -286,27 +286,44 @@ ggplot(datos, aes(x = log(Altura_cm), y = log(Peso_gr), col = Especie)) +
 ```
 Parece coexistir 7 pendientes 
 
+El modelo  1 seria el siguiente: 
+$$Peso_i = \beta_0\ +\  \beta_1log(Altura_i) \ +\epsilon_{i}$$
+mientras que el modelo 2 queda especificado como:
+
+$$Peso_i = \beta_0\ +\ \beta_1log(Altura_i)\ +\ \beta_2Especie_i\ +\ \epsilon_i$$
 
 ```{r}
 mod0 = lm(log(Peso_gr) ~ log(Altura_cm), data = datos)
-mod1 = lm(log(Peso_gr) ~ log(Altura_cm) + Especie, data = datos)
+mod1 = lm(log(Peso_gr) ~ + Especie + log(Altura_cm) , data = datos)
 
 
 anova(mod0, mod1)
-```
-Nos quedamos con el segundo modelo y nos planteamos la siguiente prueba de hipotesis. 
-Ho) la pendiente de la  Altura    es igual para las tres especies
-H1) Al menos una especie tiene un valor de la pendiente distinta a las demas.
 
+```
+Podemos observar que efectivamente hay un efecto especie  sobre la constante
+
+Nos quedamos con el segundo modelo y nos planteamos la siguiente prueba de hipotesis. 
+Ho) la pendiente de la log(Altura)    es igual para las tres especies
+H1) Al menos una especie tiene un valor de la pendiente distinta a las demas.
+ 
+ Para ver si existe un efecto Especie sobre la pendiente, debemos plantearnos un modelo con interaccion.
+El modelo con interaccion queda definido como:
+
+
+$$Peso_i = \beta_0\ +\ \beta_1log(Altura_i)\ +\ \beta_2log(Altura_i):Especie_i\ +\ \epsilon_i$$
 ```{r}
 
 mod2.0 <- lm(log(Peso_gr) ~ Especie + log(Altura_cm) + log(Altura_cm):Especie, data = datos)
 
 anova(mod1, mod2.0)
 
+summary(mod2.0)
+
 ```
 ```{r, eval=FALSE}
-pendientes <- emtrends(mod2, pairwise ~ Especie, var = 'log(Altura_cm)') ## no corre 
+library(emmeans)
+
+pendientes <- emtrends(mod2.0, pairwise ~ Especie, var = 'log(Altura_cm)') ## no corre 
 library(multcomp)
 cld(pendientes, Letters = letters)
 
