@@ -34,6 +34,8 @@ library(boot)
 ```
 
 ```{r}
+
+
 datos = biometria_peces
 
 #id <- seq(1,nrow(datos),1)
@@ -67,9 +69,6 @@ summary(datos)
 ## Análisis de supuestos
 #Multicolinealidad
 ```{r}
-
-
-
 
 #Analizando multicolinealidad
 
