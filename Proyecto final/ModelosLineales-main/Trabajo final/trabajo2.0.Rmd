@@ -345,6 +345,8 @@ ggplot(qq, aes(x = empiricos, y=..density..)) +
   xlab('Residuos studentizados')
 ```
 
+##Modelo 2 
+
 
 
 modelo_ajustado <- lm(log(Peso_gr) ~ (Longitud1)+(Altura_cm)+(Ancho_cm), data = datos)
