@@ -501,9 +501,11 @@ datos_especie
 
 
 
-mod1 <- lm(log(Peso_gr) ~ Especie, data = datos) #Modelo con "Peso ~ Especie"
+mod1.0<- lm(log(Peso_gr) ~ Especie, data = datos) #Modelo con "Peso ~ Especie"
 
-mod0 <- lm(log(Peso_gr) ~ 1, data = datos) #Modelo con "Peso ~ 1"
+mod1.1 <- lm(log(Peso_gr) ~ 1, data = datos) #Modelo con "Peso ~ 1"
+
+summary(mod0)
 
 anova(mod0, mod1)
 
@@ -514,20 +516,11 @@ anova(mod0, mod1)
 # Rechazamos H0) y afirmamos que la especie es relevante para determinar el peso de un pez
 
 
-#Ahora con el modelo completo
-
-mod1 <- lm(log(Peso_gr) ~ log(Longitud1) + log(Ancho_cm) + log(Altura_cm) + Especie, data = datos) #Con especie
-
-
-mod0 <- lm(log(Peso_gr) ~ log(Longitud1) + log(Ancho_cm) + log(Altura_cm) , data = datos) #Sin especie
-
-Anova(mod1, mod0)
-
-#Con un p-valor de 2.655e-06 la especie es significativa para el modelo
 
 
 
 summary(lm((Peso_gr) ~ Especie + 0, data = datos))
+
 
 #Vemos que para algunos peces la especie es relevante para determinar el peso mientras que para otras no
 #Por ejemplo, para los Bream estamos en el primer caso mientras que para los Smelt en el segundo
@@ -536,8 +529,8 @@ summary(lm((Peso_gr) ~ Especie + 0, data = datos))
 ggplot(datos,aes(x=Especie,y=log(Peso_gr),fill=Especie)) + geom_boxplot() +xlab('Peso') + 
   ylab('Longitud')
 
-ggplot(datos, aes(x = log(Peso_gr), y = log(Longitud1), fill = Especie)) +
-  geom_boxplot() +
+ggplot(datos, aes(x =log(Longitud1) ,y=log(Peso_gr), col = Especie)) +
+  geom_point() +
   xlab('Peso') + 
   ylab('Longitud') +
   theme_bw()
@@ -550,14 +543,23 @@ ggplot(datos, aes(x = log(Peso_gr), y = log(Longitud1), fill = Especie)) +
 ```{r}
 # residuos
 
-datos$t_i <- rstudent(mod1) #studentizados EXTERNAMENTE 
+datos$t_i <- rstudent(mod1.0) #studentizados EXTERNAMENTE 
 
-datos$pred <- fitted(mod1)
+datos$pred <- fitted(mod1.0)
+
+ggplot(datos, aes(x = pred, y = t_i)) + 
+  geom_point(color = "red",alpha=0.5,size=1)+
+  xlab('Predichos') +
+  ylab('Residuos') +
+ geom_abline(slope=0, intercept=c(-1,1), linetype="dashed",color="blue")+
+  geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()
+
+
 
 # H0) E(eps^2_i) = sigma^2
 # H1) E(eps^2_i) = sigma^2 * h(X_1, X_2, ..., X_k)
 
-breusch_pagan(mod1) #No Rechazo H0) con p-valor 0.92
+breusch_pagan(mod1.0) #No Rechazo H0) con p-valor 0.92
 
 # Normalidad
 
@@ -640,13 +642,24 @@ ggplot(datos, aes(x = log(Peso_gr), y = log(Longitud1), col = Especie)) +
 
 #Modelo con Covariable Longitud
 
-mod1 <- lm(log(Peso_gr) ~ log(Longitud1) + Especie, data = datos)
+mod1.2 <- lm(log(Peso_gr) ~ log(Longitud1) + Especie, data = datos)
 
 ###Supuestos de linealidad
 
 #Homosedasticidad
 
-datos$r_i <- residuals(mod1)  
+datos$r_i <- residuals(mod1.2)  
+
+datos$pred <- fitted(mod1.2)
+
+breusch_pagan(mod1.2) 
+ggplot(datos, aes(x = pred, y = t_i)) + 
+  geom_point(color = "red",alpha=0.5,size=1)+
+  xlab('Predichos') +
+  ylab('Residuos') +
+ geom_abline(slope=0, intercept=c(-1,1), linetype="dashed",color="blue")+
+  geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()
+
 
 
 
@@ -852,7 +865,7 @@ anova(lm(Altura_cm ~ Especie, data = datos))
 
 
 
-ggplot(datos, aes(x = Peso_gr, y = Altura_cm, col = Especie)) +
+ggplot(datos, aes(x = Altura_cm, y =Peso_gr, col = Especie)) +
   geom_point() +
   xlab('Peso') + 
   ylab('Altura') +
@@ -912,14 +925,14 @@ $$Peso_i = \beta_0\ +\ \beta_1log(Altura_i)\ +\ \beta_2log(Altura_i):Especie_i\ 
 
 mod2.0 <- lm(log(Peso_gr) ~ Especie + log(Altura_cm) + log(Altura_cm):Especie, data = datos)
 
-mod3 <- lm((Peso_gr) ~ Especie , data = datos)
-
-summary(mod2.0)
-
-anova(mod1, mod2.0)
 
 
 summary(mod2.0)
+
+anova(mod5, mod2.0)
+
+
+
 
 
 ```
@@ -934,7 +947,7 @@ library(emmeans)
 
 pendientes <- emtrends(mod2.0, pairwise ~ Especie, var = 'log(Altura_cm)') ## no corre 
 
-pendientes <- emtrends(mod0, pairwise ~ Especie, var = 'log(Altura_cm)') ## no corre 
+pendientes <- emtrends(mod5, pairwise ~ Especie, var = 'log(Altura_cm)') ## no corre 
 
 
 emmeans(mod3, ~ Especie)
