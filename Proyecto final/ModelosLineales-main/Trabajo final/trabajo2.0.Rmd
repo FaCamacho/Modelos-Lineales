@@ -24,7 +24,7 @@ library(qqplotr)
 library(tseries)
 library(emmeans)
 library(boot) 
-
+library(kableExtra)
 
 
 
@@ -91,11 +91,12 @@ str(datos)
 
 summary(datos) #Hay un pez con peso 0 gr
 
+
 datos <- datos %>% filter(.,Peso_gr > 0)
 
 summary(datos) #Deberíamos quitar el de 5.9 gr
 
-datos <- datos %>% filter(.,Peso_gr > 5.9)
+#datos <- datos %>% filter(.,Peso_gr > 5.9)
 
 summary(datos)
 
@@ -273,7 +274,7 @@ datos$pred <- fitted(modelo)
 
 
 
-breusch_pagan(modelo) # Rechazo H0) con p-valor  del 0.01%
+breusch_pagan(modelo) # Rechazo H0) con p-valor del 5%
 
 
 x0 = ggplot(datos, aes(x = pred, y = t_i)) + 
@@ -345,15 +346,23 @@ ggplot(qq, aes(x = empiricos, y=..density..)) +
   xlab('Residuos studentizados')
 ```
 
-##Modelo 2 
+## Modelo 2 
 
 
 
+```{r}
 modelo_ajustado <- lm(log(Peso_gr) ~ (Longitud1)+(Altura_cm)+(Ancho_cm), data = datos)
 
+```
 
 
+
+## modelo 3 
+
+```{r}
 modelo_ajustado2 <- lm(log(Peso_gr) ~ log(Longitud1)+log(Altura_cm)+log(Ancho_cm), data = datos)
+
+```
 
 
 
@@ -665,14 +674,14 @@ with(datos,cor(Peso_gr,Ancho_cm)) #Correlacion debil de 0.14
 
 #plot(log(datos$Peso_gr), log(datos$Ancho_cm))
 
-<<<<<<< HEAD
+
 ggplot(datos, aes(x=log(Ancho_cm), y = log(Peso_gr))) + geom_point(size=2, alpha=0.5) + theme_bw()
 
 
 #plot(lm(lm(log(Peso_gr) ~ log(Ancho_cm)  , data = datos)))
-=======
+
 # plot(lm(lm(log(Peso_gr) ~ log(Ancho_cm)  , data = datos)))
->>>>>>> ea9c9b45993af3b30853674649484042620593c8
+
 
 #Homosedasticidad
 
@@ -887,7 +896,7 @@ Nos quedamos con el segundo modelo y nos planteamos la siguiente prueba de hipot
 Ho) la pendiente de la  Altura es igual para las especies
 H1) Al menos una especie tiene un valor de la pendiente distinta a las demas.
 
-```
+
 Podemos observar que efectivamente hay un efecto especie  sobre la constante
 
 Nos quedamos con el segundo modelo y nos planteamos la siguiente prueba de hipotesis. 
@@ -938,15 +947,29 @@ summary(mod0)
 ```{r}
 set.seed(84735)
 
-cross= prediction_summary_cv(model = modelo,  data = datos, k =10 )
 
 glm.fit <- glm(modelo, data=datos)
 
 cv.err.kfold <- cv.glm(data=datos, glmfit=glm.fit, K=10)
-cv.err.kfold$delta[1]
- ## hacer lo mismo para los otros 2 modelos y comparar... ver la fundamentacion
-## loo()
+k1 = round(cv.err.kfold$delta[1],2)
+
+
+glm.fit2 = glm(modelo_ajustado, data = datos)
+
+cv.err.kfold2 <- cv.glm(data=datos, glmfit=glm.fit2, K=10)
+k2 = round(cv.err.kfold2$delta[1],2)
+
+glm.fit3 <- glm(modelo_ajustado2, data=datos)
+cv.err.kfold3 <- cv.glm(data=datos, glmfit=glm.fit3, K=10)
+k3=round(cv.err.kfold3$delta[1],2)
+
+df = data.frame(modelo = c("modelo 1", "modelo 2","modelo 3"), k_folds_cv = c(k1,k2,k3))
+
+
+df %>%  kable() %>%   kable_styling(font_size = 8, full_width = FALSE, latex_options = "HOLD_position") %>% 
+    kable_classic_2()
 
 
 ```
+
 
