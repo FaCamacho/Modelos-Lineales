@@ -450,6 +450,7 @@ ggplot(qq, aes(x = empiricos, y=..density..)) +
 ## Atípicos
 
 ```{r}
+##afuera?
 
 h_i <- influence(modelo_ajustado2)$hat
 D_i <- cooks.distance(modelo_ajustado2)
@@ -473,6 +474,8 @@ ggplot(df, aes(x = i, y = D_i)) +
 #evaluacion de modelo 
 
 ```{r}
+
+
  bic1 = BIC(modelo)
 bic2= BIC(modelo_ajustado)
 bic3 = BIC(modelo_ajustado2)
@@ -492,6 +495,30 @@ summary(modelo_ajustado2)$adj.r.squared
 ```
 ## ANOVA a 1 vía
 
+El objetivo es estudiar si existe igualdad de medias para la variable categorica 'Especie'. 
+Haciendo el analisis de varianza a una via, nos plantemos 2 modelos, uno solo con la constante y otro especificando la especie.
+
+El modelo con la constante queda especificado de la siguiente manera: 
+
+$$Peso_{ij} = \mu + \epsilon_{ij}$$
+mieintras que si le agregamos el efecto especie queda:
+
+$$Peso_{ij} = \mu + Especie_{ij} +  \epsilon_{ij}$$
+
+Se puede observar tambien mediante un grafico de puntos que existe una relacion lineal entre el peso y la longitud.  Mas aun haciendo una transformacion logaritmica  a ambas variables.
+
+A un nivel de significacion del 5%, podemos afirmar que  tenemos  evidencia suficiente para  rechaza la hipotesis nula de igualdad de medias. 
+
+Al plantearnos el modelo con la covariable longitud1, podemos ver que  para predecir el peso  existe  ademas de un efecto especie un efecto longitud. 
+
+
+
+
+
+
+
+
+
 
 ```{r}
 
@@ -503,17 +530,44 @@ datos_especie <- datos %>%
             "min(peso)"=round(min(Peso_gr),2),
             "max(peso)"=round(max(Peso_gr),2))
 
-datos_especie
+
+ggplot(datos,aes(x=Especie,y=Peso_gr,fill=Especie)) + geom_boxplot() +xlab('Peso') + 
+  ylab('Longitud')
 
 
 
-mod1.0<- lm(log(Peso_gr) ~ Especie, data = datos) #Modelo con "Peso ~ Especie"
+## se nota mas la linealidad en los regresores con  la transformacion logaritmica aplciada 
 
+ggplot(datos, aes(x =log(Longitud1) ,y=log(Peso_gr), col = Especie)) +
+  geom_point(alpha = 0.5, size = 2) +
+  xlab('Peso') + 
+  ylab('Longitud') +  scale_color_brewer(palette="Dark2") + 
+  theme_bw()
+
+## creo que anova(mod1.0) se encarga de comparar ya de por si el modelo de grupos con la que tiene solo la cte.
 mod1.1 <- lm(log(Peso_gr) ~ 1, data = datos) #Modelo con "Peso ~ 1"
 
-summary(mod1.0)
+mod1.0<- lm(log(Peso_gr) ~ Especie, data = datos)   #Modelo con "Peso ~ Especie"
 
-anova(mod0, mod1)
+
+
+mod1.2 <- lm(log(Peso_gr) ~ Especie + log(Longitud1) , data = datos)
+
+
+
+Anova(mod1.2)
+
+## tenemos la significacion de la covariable ajustnado por el efecto especie. 
+## y la significacion de la covariable ajustando por el efecto longitud 
+
+# hay un efecto especie como se vio anteriormente. 
+
+
+
+
+# summary(mod1.0)
+
+#anova(mod0, mod1)
 
 #H0) m1 = m2 = ... = mJ
 #H1) No H0)
@@ -532,8 +586,7 @@ summary(lm((Peso_gr) ~ Especie + 0, data = datos))
 #Por ejemplo, para los Bream estamos en el primer caso mientras que para los Smelt en el segundo
 
 
-ggplot(datos,aes(x=Especie,y=log(Peso_gr),fill=Especie)) + geom_boxplot() +xlab('Peso') + 
-  ylab('Longitud')
+
 
 ggplot(datos, aes(x =log(Longitud1) ,y=log(Peso_gr), col = Especie)) +
   geom_point() +
@@ -649,12 +702,28 @@ ggplot(datos, aes(x = log(Peso_gr), y = log(Longitud1), col = Especie)) +
 
 
 ## Ancova 
+\Para ver si existe un efecto Especie sobre la pendiente, debemos plantearnos un modelo con interaccion.
+El modelo con interaccion queda definido como:
+
+
+$$Peso_i = \beta_0\ +\ \beta_1log(Longitud_i)\ +\ \beta_2log(Longitud1_i):Especie_i\ +\ \epsilon_i$$
+
+Ahora pasamos a estudiar si  efectivamente existe igualdad de pendientes entre las especies.
+ No hay evidencia suficiente para decir que la pendiente sean  distinta entre las especies. 
+
+ 
+ 
 
 ```{r}
 
 #Modelo con Covariable Longitud
 
-mod1.2 <- lm(log(Peso_gr) ~ log(Longitud1) + Especie, data = datos)
+
+ 
+mod2.0 <- lm(log(Peso_gr) ~ log(Longitud1)+Especie +   log(Longitud1):Especie, data = datos)
+
+anova(mod2.1,mod2.0)
+#mod1.2 <- lm(log(Peso_gr) ~ log(Longitud1) + Especie, data = datos)
 
 ###Supuestos de linealidad
 
@@ -690,7 +759,7 @@ ggplot(datos, aes(x =log(Longitud1), y = log(Peso_gr), color=Especie)) +
 ```{r}
 
 #Modelo con Covariable ANCHO
-
+##AFUERA 
 mod3 <- lm(log(Peso_gr) ~ log(Ancho_cm) + Especie  , data = datos)
 
 ###Supuestos de modelos lineales
@@ -919,23 +988,10 @@ mod1 = lm(log(Peso_gr) ~ + Especie + log(Altura_cm) , data = datos)
 anova(mod0, mod1)
 
 ```
-Nos quedamos con el segundo modelo y nos planteamos la siguiente prueba de hipotesis. 
-Ho) la pendiente de la  Altura es igual para las especies
-H1) Al menos una especie tiene un valor de la pendiente distinta a las demas.
 
 
-Podemos observar que efectivamente hay un efecto especie  sobre la constante
-
-Nos quedamos con el segundo modelo y nos planteamos la siguiente prueba de hipotesis. 
-Ho) la pendiente de la log(Altura)    es igual para las tres especies
-H1) Al menos una especie tiene un valor de la pendiente distinta a las demas.
- 
- Para ver si existe un efecto Especie sobre la pendiente, debemos plantearnos un modelo con interaccion.
-El modelo con interaccion queda definido como:
-
-
-$$Peso_i = \beta_0\ +\ \beta_1log(Altura_i)\ +\ \beta_2log(Altura_i):Especie_i\ +\ \epsilon_i$$
-```{r}
+```{r} 
+##AFUERA 
 
 mod2.0 <- lm(log(Peso_gr) ~ Especie + log(Altura_cm) + log(Altura_cm):Especie, data = datos)
 
@@ -957,6 +1013,7 @@ anova(mod5, mod2.0)
 
 ```{r, eval=FALSE}
 
+## sacar 
 library(emmeans)
 
 pendientes <- emtrends(mod2.0, pairwise ~ Especie, var = 'log(Altura_cm)') ## no corre 
@@ -971,23 +1028,28 @@ summary(mod0)
 ```
 ## Cross-Validation 
 
+El objetivo de la validacion cruzada es separar primero la base en 2, una de testeo  y otra de entrenamiento. Luego se usa esta ultima para estimar el modelo. Luego se utiliza el modelo para predecir la variable peso en la base de testeo. Por ultimo se calcula el ECM de dichas predicciones
+
+$$CV_{[n]}= \frac{1}{k}\sum_{i=1}^kECM_{i}$$
+
+
 ```{r}
 set.seed(84735)
 
 
-glm.fit <- glm(modelo, data=datos)
+glm.fit <- glm(mod1.1, data=datos) ## solo la constante ~ 1 
 
 cv.err.kfold <- cv.glm(data=datos, glmfit=glm.fit, K=10) #Solo con la constante
 k1 = round(cv.err.kfold$delta[1],2)
 
 
-glm.fit2 = glm(modelo_ajustado, data = datos)
+glm.fit2 = glm(mod1.0, data = datos)
 
 cv.err.kfold2 <- cv.glm(data=datos, glmfit=glm.fit2, K=10) #Con especie
 k2 = round(cv.err.kfold2$delta[1],2)
-
-glm.fit3 <- glm(modelo_ajustado2, data=datos)
-cv.err.kfold3 <- cv.glm(data=datos, glmfit=glm.fit3, K=10) #Con todo
+?cv.glm
+glm.fit3 <- glm(mod2.1, data=datos)
+cv.err.kfold3 <- cv.glm(data=datos, glmfit=glm.fit3, K=10) #Con todo ( es decir con la covariable longitud1 y especie)
 k3=round(cv.err.kfold3$delta[1],2)
 
 df = data.frame(modelo = c("modelo 1", "modelo 2","modelo 3"), k_folds_cv = c(k1,k2,k3))
@@ -1007,6 +1069,7 @@ df %>%  kable() %>%   kable_styling(font_size = 8, full_width = FALSE, latex_opt
 n=nrow(datos)
 #Leave one out
 
+## se rompe todo 
 prod<-rep(NA,n)
 
 for(i in 1:n){
