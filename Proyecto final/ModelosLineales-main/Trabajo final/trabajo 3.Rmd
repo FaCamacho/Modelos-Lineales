@@ -175,11 +175,6 @@ altura_especie <- ggplot(datos, aes(x = log(Altura_cm), y = log(Peso_gr), color=
   ylab('Peso')
 
 
-
-
-
-
-
 grid.arrange(longitud_especie
              ,ancho_especie
              ,altura_especie,
@@ -221,7 +216,7 @@ vif(lm(Peso_gr~ .-Especie-Longitud2-Longitud3, data = datos))
 Como ya se menciono,el primer modelo estimado consiste en la regresion de la variable peso con las variables explicativas que fueron seleccionadas en el paso de multicolinealidad.
 El modelo queda esepecificado como:
 
-$$peso_{i}=  \beta_0 +\ \beta_1Longitud1_{i} + \beta_2Altura_{i}\ +\ beta_3Ancho_{i}\ +\ \epsilon_{i}$$
+$$peso_{i}=  \beta_0 +\ \beta_1Longitud1_{i} + \beta_2Altura_{i}\ +\beta_3Ancho_{i}\ +\ \epsilon_{i}$$
 
 
 ```{r}
