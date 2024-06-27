@@ -407,7 +407,12 @@ $$Log(Peso_{i}) = \beta_0\ + \beta_1Log(Longitud1_{i})\ \ +\ \epsilon_i$$
 ```{r}
 mod3 = lm(log(Peso_gr) ~ log(Longitud1) , data = datos)
 
+
+
 summary(mod3)
+
+
+
 ```
 
 
@@ -798,6 +803,8 @@ ggplot(qq, aes(x = empiricos, y=..density..)) +
   xlab('Residuos studentizados')
 
 
+
+
 ```
 
 
@@ -843,6 +850,14 @@ df %>%  kable() %>%   kable_styling(font_size = 8, full_width = FALSE, latex_opt
 
 
 
+
+```
+
+
+
+```{r}
+
+
 #Predicción:
 
 
@@ -864,7 +879,5 @@ for(i in 1:n){
 
 
 
-
-
-
 ```
+
