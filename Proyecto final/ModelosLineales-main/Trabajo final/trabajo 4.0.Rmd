@@ -850,13 +850,13 @@ n=nrow(datos)
 #Leave one out
 
 ## se rompe todo 
-prod<-rep(NA,n)
+pred<-rep(NA,n)
 
 for(i in 1:n){
   
   datos_i <- datos[-i,]
   mod_i <- update(modelo, data= datos_i)
-  pred[i]<- (predict(mod_i,newdata=datos[i,])$prod)
+  pred[i]<- (predict(mod_i,newdata=datos[i,])$pred)
 }
 
 
