@@ -224,7 +224,7 @@ $$peso_{i}=  \beta_0 +\ \beta_1Longitud1_{i} + \beta_2Altura_{i}\ +\beta_3Ancho_
 
 modelo <- lm(Peso_gr~ Longitud1+Altura_cm+Ancho_cm, data = datos)
 
-summary(modelo)
+summary(modelo) #Podríamos quitar esto ya que hasta no cumplir los supuestos la interpretación del summary no aporta
 
 ```
 
