@@ -219,7 +219,6 @@ Con un $\alpha=0.05$ rechazamos la hipotesis nula, por lo que podemos afirmar qu
 $$ H_0)\ E(\epsilon_{i}^{2}) =  \sigma^2\ vs\ H_1)\ no\ H_0$$
 
 ```{r}
-datos$r_i <- residuals(modelo)  
 
 # residuos
 
@@ -336,7 +335,6 @@ Ademas, los test de normalidad de Shapiro-Wilk y Jarque-Bera, segun el criterio 
 
 ```{r}
 
-datos$r_i <- residuals(modelo_ajustado2)  
 
 # residuos
 
@@ -367,7 +365,6 @@ ggplot(datos, aes(x = pred, y = t_i)) +
 
 
 
-summary(mod3)
 ```
 
 ##Normalidad
@@ -402,9 +399,18 @@ ggplot(qq, aes(x = empiricos, y=..density..)) +
 ```
 
 
-# Modelo 3
+# Modelo 3 (Justificar el quedarnos solo con longitud)
 
-$$Log(Peso_{i}) = \beta_0\ + \beta_1Log(Longitud1_{i})\ +\ \beta_2Especie\ +\ \epsilon_i$$
+$$Log(Peso_{i}) = \beta_0\ + \beta_1Log(Longitud1_{i})\ \ +\ \epsilon_i$$
+
+
+```{r}
+mod3 = lm(log(Peso_gr) ~ log(Longitud1) , data = datos)
+
+summary(mod3)
+```
+
+
 ## Significacion individual
 
 Para cada uno de las variables explicativas se realiza la siguiente prueba de hipotesis:
@@ -423,11 +429,7 @@ Siguiendo el criterio del p_valor, a un nivel del 5%, la evidencia empirica sugi
 
 
 
-```{r}
-mod3 = lm(log(Peso_gr) ~ log(Longitud1) + Especie, data = datos)
 
-summary(mod3)
-```
 
 
 
@@ -438,7 +440,7 @@ summary(mod3)
 
 
 ```{r}
-datos$r_i <- residuals(mod3)  
+
 
 # residuos
 
@@ -451,7 +453,7 @@ datos$pred <- fitted(mod3)
 
 
 
-breusch_pagan(mod3) #No Rechazo H0) con p-valor de 0.73
+breusch_pagan(mod3) #No Rechazo H0) con p-valor de 0.3468923
 
 
 ggplot(datos, aes(x = pred, y = t_i)) + 
@@ -487,7 +489,7 @@ ggplot(qq, aes(x = teoricos, y = empiricos)) +
 
 shapiro.test(datos$t_i) #Rechazo H0) con un p-valor de 0.0049
 tseries::jarque.bera.test(datos$t_i) #Rechazo H0) con un p-valor de 1.794e-05
-ks.test(datos$t_i, 'pnorm') #No Rechazo H0) con un p-valor de 0.5317
+ks.test(datos$t_i, 'pnorm') #Rechazo H0) con un p-valor de 0.5317
 
 ggplot(qq, aes(x = empiricos, y=..density..)) +
   geom_histogram(breaks = seq(-3, 3, 1), col = 'white') +
@@ -497,28 +499,7 @@ ggplot(qq, aes(x = empiricos, y=..density..)) +
 
 
 
-## Atípicos
 
-```{r}
-##afuera?
-
-h_i <- influence(modelo_ajustado2)$hat
-D_i <- cooks.distance(modelo_ajustado2)
-df <- data.frame(i = 1:nrow(datos),
-                 h_i = h_i,
-                 D_i = D_i)
-
-# Distancia de Cook
-ggplot(df, aes(x = i, y = D_i)) +
-  geom_point() +
-  geom_segment(aes(x = i, xend = i, y = 0, yend = D_i)) +
-  xlab('') +
-  ylab(expression(D[i])) +
-  geom_abline(slope = 0, intercept = 4/50, col = 2, linetype = 'dashed')
-
-#hay algún atípico 
-
-```
 
 
 #evaluacion de modelo 
@@ -540,9 +521,10 @@ summary(modelo_ajustado)$adj.r.squared
 summary(modelo_ajustado2)$adj.r.squared
 
 
-
-
 ```
+
+
+
 ## ANOVA a 1 vía
 
 El objetivo es estudiar si existe igualdad de medias para la variable categorica 'Especie'. 
@@ -555,14 +537,13 @@ $$Peso_{ij} = \mu + \epsilon_{ij}$$
 mieintras que si le agregamos el efecto especie queda:
 
 $$Peso_{ij} = \mu + Especie_{ij} +  \epsilon_{ij}$$
-## Ancova 
 
 
-Se puede observar tambien mediante un grafico de puntos que existe una relacion lineal entre el peso y la longitud.  Mas aun haciendo una transformacion logaritmica  a ambas variables.
+
 
 A un nivel de significacion del 5%, podemos afirmar que  tenemos  evidencia suficiente para  rechaza la hipotesis nula de igualdad de medias. 
 
-Al plantearnos el modelo con la covariable longitud1, podemos ver que  para predecir el peso  existe  ademas de un efecto especie un efecto longitud. 
+
 
 
 
@@ -575,6 +556,7 @@ Al plantearnos el modelo con la covariable longitud1, podemos ver que  para pred
 
 ```{r}
 
+# Análisis descriptivo de los datos
 
 datos_especie <- datos %>%
   group_by(Especie) %>%
@@ -584,42 +566,20 @@ datos_especie <- datos %>%
             "max(peso)"=round(max(Peso_gr),2))
 
 
-ggplot(datos,aes(x=Especie,y=log(Peso_gr),fill=Especie)) + geom_boxplot() +xlab('Peso') + 
-  ylab('Longitud')
 
 
 
-## se nota mas la linealidad en los regresores con  la transformacion logaritmica aplciada 
 
-ggplot(datos, aes(x =log(Longitud1) ,y=log(Peso_gr), col = Especie)) +
-  geom_point(alpha = 0.5, size = 2) +
-  xlab('Peso') + 
-  ylab('Longitud') +  scale_color_brewer(palette="Dark2") + 
-  theme_bw()
+
 
 ## creo que anova(mod1.0) se encarga de comparar ya de por si el modelo de grupos con la que tiene solo la cte.
 
 mod1.0<- lm(log(Peso_gr) ~ Especie, data = datos)   #Modelo con "Peso ~ Especie"
 
 
-
-mod1.2 <- lm(log(Peso_gr) ~ Especie + log(Longitud1) , data = datos) ## ancova 
-
+anova(mod1.0)
 
 
-Anova(mod1.2)
-
-## tenemos la significacion de la covariable ajustnado por el efecto especie. 
-## y la significacion de la covariable ajustando por el efecto longitud 
-
-# hay un efecto especie como se vio anteriormente. 
-
-
-
-
-# summary(mod1.0)
-
-#anova(mod0, mod1)
 
 #H0) m1 = m2 = ... = mJ
 #H1) No H0)
@@ -631,22 +591,20 @@ Anova(mod1.2)
 
 
 
-summary(lm((Peso_gr) ~ Especie + 0, data = datos))
+summary(lm((Peso_gr) ~ Especie , data = datos))
 
 
 #Vemos que para algunos peces la especie es relevante para determinar el peso mientras que para otras no
 #Por ejemplo, para los Bream estamos en el primer caso mientras que para los Smelt en el segundo
 
 
+ggplot(datos,aes(x=Especie,y=(Peso_gr),fill=Especie)) + geom_boxplot() +xlab('Especie') + 
+  ylab('Peso')
 
 
-ggplot(datos, aes(x =log(Longitud1) ,y=log(Peso_gr), col = Especie)) +
-  geom_point() +
-  xlab('Peso') + 
-  ylab('Longitud') +
-  theme_bw()
 
-
+ggplot(datos,aes(x=Longitud1,y=(Peso_gr),colour =Especie)) + geom_point() +xlab('Especie') + 
+  ylab('Peso')
 
 ```
 
@@ -700,45 +658,16 @@ ggplot(qq, aes(x = empiricos, y=..density..)) +
   geom_histogram(breaks = seq(-3, 3, 1), col = 'white') +
   xlab('Residuos studentizados')
 
-
-
-###Supuestos de ANCOVA
-
-## Supuesto de correlación
-
-with(datos,cor(Peso_gr,Longitud1))
-# Correlacion fuerte de 0.92
-
-
-crPlot(mod1, variable = 'log(Longitud1)', pch = 16)
-
-# Supuesto igualdad de pendientes
-mod2 <- lm(log(Peso_gr)~ log(Longitud1) + Especie + log(Longitud1):Especie, data = datos)
-
-
-
-mod2.1 <- lm(log(Peso_gr)~ log(Longitud1) + Especie , data = datos)  #Este es el modelo posta posta posta posta
-
-summary(mod2)
-
-#H0) b1 = b2 = ... = bJ
-#H1) No H0)
-
-anova(mod2.1, mod2) #No Rechazo H0) Las pendientes son iguales
-
-# Supuesto la covariable NO afecta la media de cada especie
-anova(lm(log(Longitud1) ~ Especie, data = datos))
-
-
-#Aquí vemos rectas notoriamente lineales, con las mismas pendientes y dispersión en torno a las rectas de regresión lineal
-
-#Concluimos que la longitud como covariable no altera la capacidad explicativa de la especie.
-
-
-
-
-
 ```
+
+
+
+
+
+
+
+
+
 
 
 
@@ -758,18 +687,50 @@ Ahora pasamos a estudiar si  efectivamente existe igualdad de pendientes entre l
 
 
 
+$$H_0) B_{i} = 0\ vs\ H_1) B_{i} \neq 0$$
+
+Se puede observar tambien mediante un grafico de puntos que existe una relacion lineal entre el peso y la longitud.  Mas aun haciendo una transformacion logaritmica  a ambas variables.
+
+Al plantearnos el modelo con la covariable longitud1, podemos ver que  es suficiente para predecir el peso. Por lo que existe un efecto de la longitud pero no un efecto de especie.
+
+
+
+
 
 
 
 
 ```{r}
+
+mod2.0 <- lm(log(Peso_gr) ~ log(Longitud1) + Especie +   log(Longitud1):Especie, data = datos)
+
 mod2.1 <- lm(log(Peso_gr)~ log(Longitud1) + Especie , data = datos)
 
 
-anova(mod2.1,mod2.0)
+
+anova(mod2.1,mod2.0) 
+
+
+
+#ggplot(datos, aes(x =log(Longitud1) ,y=log(Peso_gr), col = Especie)) +
+ # geom_point(alpha = 0.5, size = 2) +
+  #xlab('Peso') + 
+  #ylab('Longitud') +  scale_color_brewer(palette="Dark2") + 
+  #theme_bw()+
+  #geom_smooth(method = 'lm', se =FALSE, alpha=0.2, size=0.7)
+  
+
+
+ggplot(datos, aes(x =log(Longitud1) ,y=log(Peso_gr), col = Especie)) +
+  geom_smooth(method = 'lm', se =FALSE, alpha=0.2, size=1)+
+  xlab('Peso') + 
+  ylab('Longitud') +  scale_color_brewer(palette="Dark2") + 
+  theme_bw()
+  
+
 ```
 
-
+No rechazamos $H_0)$ por lo tanto vemos que las pendientes son iguales entre las especies con un nivel de significación del 5%.
 
 
  
@@ -777,20 +738,23 @@ anova(mod2.1,mod2.0)
 
 ```{r}
 
-#Modelo con Covariable Longitud
-
-
- 
-mod2.0 <- lm(log(Peso_gr) ~ log(Longitud1) + Especie +   log(Longitud1):Especie, data = datos)
-
-anova(mod2.1,mod2.0)
-#mod1.2 <- lm(log(Peso_gr) ~ log(Longitud1) + Especie, data = datos)
 
 ###Supuestos de linealidad
 
+###Supuestos de ANCOVA
+
+## Supuesto de correlación
+
+with(datos,cor(Peso_gr,Longitud1))
+# Correlacion fuerte de 0.916
+
+
+crPlot(mod1.2, variable = 'log(Longitud1)', pch = 16)
+
 #Homosedasticidad
 
-datos$r_i <- residuals(mod1.2)  
+
+datos$t_i <- rstudent(mod1.2)
 
 datos$pred <- fitted(mod1.2)
 
@@ -805,56 +769,6 @@ ggplot(datos, aes(x = pred, y = t_i)) +
   geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()
 
 
-
-
-ggplot(datos, aes(x =log(Longitud1), y = log(Peso_gr), color=Especie)) + 
-  geom_point(alpha=0.5,size=2)+
-  xlab('Longitud') +
-  ylab('Peso')
-```
-
-
-
-
-
-```{r}
-
-#Modelo con Covariable ANCHO
-##AFUERA 
-mod3 <- lm(log(Peso_gr) ~ log(Ancho_cm) + Especie  , data = datos)
-
-###Supuestos de modelos lineales
-
-#Linealidad
-
-with(datos,cor(Peso_gr,Ancho_cm)) #Correlacion debil de 0.14
-
-#plot(log(datos$Peso_gr), log(datos$Ancho_cm))
-
-
-ggplot(datos, aes(x=log(Ancho_cm), y = log(Peso_gr))) + geom_point(size=2, alpha=0.5) + theme_bw()
-
-
-#plot(lm(lm(log(Peso_gr) ~ log(Ancho_cm)  , data = datos)))
-
-# plot(lm(lm(log(Peso_gr) ~ log(Ancho_cm)  , data = datos)))
-
-
-#Homosedasticidad
-
-datos$r_i <- residuals(mod3)  
-
-# residuos
-
-datos$t_i <- rstudent(mod3) #studentizados EXTERNAMENTE 
-
-datos$pred <- fitted(mod3)
-
-# H0) E(eps^2_i) = sigma^2
-# H1) E(eps^2_i) = sigma^2 * h(X_1, X_2, ..., X_k)
-
-breusch_pagan(mod3) #Rechazo H0) con p-valor 0.0001425355
-
 # Normalidad
 
 n <- nrow(datos)
@@ -875,152 +789,14 @@ ggplot(qq, aes(x = teoricos, y = empiricos)) +
 # H1) Los errores NO son normales
 
 
-shapiro.test(datos$t_i) #No echazo H0) p-value = 0.5116
-tseries::jarque.bera.test(datos$t_i) #No Rechazo H0) p-value = 0.916
-ks.test(datos$t_i, 'pnorm') #No Rechazo H0) 0.8489
+shapiro.test(datos$t_i) #Rechazo H0) con p-value = 0.0009448
+tseries::jarque.bera.test(datos$t_i) #Rechazo H0) con p-value = 2.984e-09
+ks.test(datos$t_i, 'pnorm') #No Rechazo H0) con p-value = 0.8061
 
 ggplot(qq, aes(x = empiricos, y=..density..)) +
   geom_histogram(breaks = seq(-3, 3, 1), col = 'white') +
   xlab('Residuos studentizados')
 
-###Supuestos de ANCOVA
-
-## Supuesto de correlación
-
-with(datos,cor(Peso_gr,Ancho_cm))
-# Correlacion debil de 0.14
-
-
-crPlot(mod3, variable = 'log(Ancho_cm)', pch = 16)
-
-# Supuesto igualdad de pendientes
-mod4 <- lm(Peso_gr~ Ancho_cm + Especie + Ancho_cm:Especie, data = datos)
-
-#H0) b1 = b2 = ... = bJ
-#H1) No H0)
-
-anova(mod3, mod4) #Rechazo H0)
-
-# Supuesto la covariable NO afecta la media de cada especie
-anova(lm(Ancho_cm ~ Especie, data = datos))
-
-#p-valor : < 2.2e-16
-# Rechazo el supuesto de que la covariable Ancho NO afecta la medida de cada especie
-
-
-
-ggplot(datos, aes(x = Peso_gr, y = Ancho_cm, col = Especie)) +
-  geom_point() +
-  xlab('Peso') + 
-  ylab('Ancho') +
-  theme_bw()+
-  geom_smooth(method = 'lm', se =FALSE)
-
-#Aquí vemos rectas lineales, con distintas pendientes y dispersión alejada de las rectas de regresión lineal en varios casos
-
-
-
-
-```
-
-
-
-```{r}
-
-#Modelo con Covariable ALTURA
-
-mod5 <- lm(log(Peso_gr) ~ log(Altura_cm) + Especie  , data = datos)
-
-###Supuestos de modelos lineales
-
-#Linealidad
-
-with(datos,cor(Peso_gr,Altura_cm)) #Correlacion debil de 0.19
-
-plot(log(datos$Peso_gr), log(datos$Altura_cm))
-
-
-#Homosedasticidad
-
-datos$r_i <- residuals(mod5)  
-
-# residuos
-
-datos$t_i <- rstudent(mod5) #studentizados EXTERNAMENTE 
-
-datos$pred <- fitted(mod5)
-
-# H0) E(eps^2_i) = sigma^2
-# H1) E(eps^2_i) = sigma^2 * h(X_1, X_2, ..., X_k)
-
-breusch_pagan(mod5) #Rechazo H0) con p-valor 3.463588e-05
-
-# Normalidad
-
-n <- nrow(datos)
-
-z_i <- qnorm(seq(n)/(n + 1))
-
-qq <- data.frame(teoricos = z_i,empiricos = sort(datos$t_i))
-
-ggplot(qq, aes(x = teoricos, y = empiricos)) +
-  geom_point() +
-  xlab('Cuantiles teoricos') +
-  ylab('Cuantiles empiricos') +
-  geom_abline(slope = 1, intercept = 0, col = 2, size = 1.5)
-
-
-# PRUEBA DE HIPOTESIS
-# H0) Los errores son normales
-# H1) Los errores NO son normales
-
-
-shapiro.test(datos$t_i) #No rechazo H0) p-value = 0.2278
-tseries::jarque.bera.test(datos$t_i) #No Rechazo H0) p-value = 0.7418
-ks.test(datos$t_i, 'pnorm') #No Rechazo H0) 0.7212
-
-ggplot(qq, aes(x = empiricos, y=..density..)) +
-  geom_histogram(breaks = seq(-3, 3, 1), col = 'white') +
-  xlab('Residuos studentizados')
-
-###Supuestos de ANCOVA
-
-## Supuesto de correlación
-
-with(datos,cor(Peso_gr,Altura_cm))
-# Correlacion debil de 0.19
-
-
-crPlot(mod5, variable = 'log(Altura_cm)', pch = 16)
-
-# Supuesto igualdad de pendientes
-mod6 <- lm(Peso_gr~ Altura_cm + Especie + Altura_cm:Especie, data = datos)
-
-#H0) b1 = b2 = ... = bJ
-#H1) No H0)
-
-anova(mod5, mod6) #Rechazo H0)
-
-# Supuesto la covariable NO afecta la media de cada especie
-anova(lm(Altura_cm ~ Especie, data = datos))
-
-#p-valor : < 2.2e-16
-# Rechazo el supuesto de que la covariable Altura NO afecta la medida de cada especie
-
-
-
-ggplot(datos, aes(x = Altura_cm, y =Peso_gr, col = Especie)) +
-  geom_point() +
-  xlab('Peso') + 
-  ylab('Altura') +
-  theme_bw()+
-  geom_smooth(method = 'lm', se =FALSE)
-
-#Aquí vemos rectas lineales, con distintas pendientes y dispersión concentrada en las rectas de regresión lineal en varios casos.
-# Altura Podría ser una buena covariable para el peso de los peces
-
-
-
 
 ```
 
@@ -1030,63 +806,6 @@ ggplot(datos, aes(x = Altura_cm, y =Peso_gr, col = Especie)) +
 
 
 
-
-
-
-Parece coexistir 7 pendientes 
-
-El modelo  1 seria el siguiente: 
-$$Peso_i = \beta_0\ +\  \beta_1log(Altura_i) \ +\epsilon_{i}$$
-mientras que el modelo 2 queda especificado como:
-
-$$Peso_i = \beta_0\ +\ \beta_1log(Altura_i)\ +\ \beta_2Especie_i\ +\ \epsilon_i$$
-
-```{r}
-mod0 = lm(log(Peso_gr) ~ log(Altura_cm), data = datos)
-mod1 = lm(log(Peso_gr) ~ + Especie + log(Altura_cm) , data = datos)
-
-
-anova(mod0, mod1)
-
-```
-
-
-```{r} 
-##AFUERA 
-
-mod2.0 <- lm(log(Peso_gr) ~ Especie + log(Altura_cm) + log(Altura_cm):Especie, data = datos)
-
-
-
-summary(mod2.0)
-
-anova(mod5, mod2.0)
-
-
-
-
-
-```
-
-
-
-
-
-```{r, eval=FALSE}
-
-## sacar 
-library(emmeans)
-
-pendientes <- emtrends(mod2.0, pairwise ~ Especie, var = 'log(Altura_cm)') ## no corre 
-
-pendientes <- emtrends(mod5, pairwise ~ Especie, var = 'log(Altura_cm)') ## no corre 
-
-
-emmeans(mod3, ~ Especie)
-
-summary(mod0)
-
-```
 ## Cross-Validation 
 
 El objetivo de la validacion cruzada es separar primero la base en 2, una de testeo  y otra de entrenamiento. Luego se usa esta ultima para estimar el modelo. Luego se utiliza el modelo para predecir la variable peso en la base de testeo. Por ultimo se calcula el ECM de dichas predicciones
