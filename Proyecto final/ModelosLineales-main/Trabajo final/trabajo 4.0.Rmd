@@ -165,7 +165,7 @@ altura_especie <- ggplot(datos, aes(x = log(Altura_cm), y = log(Peso_gr), color=
   theme_bw() +
   xlab('Alto') +
   ylab('Peso')+
-   labs(caption = "Gráfico 4)")+
+  labs(caption = "Gráfico 4)")+
   theme(legend.position = "none")
 
 
@@ -290,7 +290,7 @@ x5= grafico("Ancho_cm")
 grid.arrange(x0,x1,x4,x5,ncol=2,nrow=2)
 
 
-breusch_pagan(modelo)$p.value # Rechazo H0) con p-valor del 5%
+breusch_pagan(modelo) # Rechazo H0) con p-valor del 5%
 
 
 
