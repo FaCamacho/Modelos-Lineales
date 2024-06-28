@@ -139,42 +139,7 @@ matriz_correlacion <- cor(cuanti)
 
 
 
-```{r}
 
-
-
-
-longitud_especie <- ggplot(datos, aes(x = log(Longitud1), y = log(Peso_gr), color=Especie)) + 
-  geom_point(alpha=0.5,size=2)+
-  theme_bw() +
-  xlab('Longitud') +
-  ylab('Peso')+
-  labs(title= "Gráficos de dispersión")+
-  theme(legend.position = "none")
-
-
-ancho_especie <- ggplot(datos, aes(x = log(Ancho_cm), y = log(Peso_gr), color=Especie)) + 
-  geom_point(alpha=0.5,size=2)+
-  theme_bw() +
-  xlab('Ancho') +
-  ylab('Peso')+
-  theme(legend.position = "none")
-
-altura_especie <- ggplot(datos, aes(x = log(Altura_cm), y = log(Peso_gr), color=Especie)) + 
-  geom_point(alpha=0.5,size=2)+
-  theme_bw() +
-  xlab('Alto') +
-  ylab('Peso')+
-  labs(caption = "Gráfico 4)")+
-  theme(legend.position = "none")
-
-
-grid.arrange(longitud_especie
-             ,ancho_especie
-             ,altura_especie,
-             ncol=1,nrow=3)
-
-```
 
 
 
@@ -329,7 +294,7 @@ ggplot(qq, aes(x = empiricos, y=..density..)) +
             axis.title.x=element_text(face="bold", size=12),
             plot.title=element_text(size=16, face="bold", hjust=0.5)) +
   xlab('Residuos studentizados')+
-  labs(caption = "Gráfico 6)",title = "Residuos externamente estudentizados")
+  labs(caption = "Gráfico 3)",title = "Residuos externamente studentizados")
   
 ```
 
@@ -377,7 +342,8 @@ ggplot(datos, aes(x = pred, y = t_i)) +
   xlab('Predichos') +
   ylab('Residuos') +
  geom_abline(slope=0, intercept=c(-1,1), linetype="dashed",color="blue")+
-  geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()
+  geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()+
+  labs(caption = "Gráfico 4)",title = "Residuos externamente estudentizados vs Predichos")
 
 
 
@@ -407,7 +373,8 @@ ggplot(qq, aes(x = teoricos, y = empiricos)) +
   geom_point() +
   xlab('Cuantiles teoricos') +
   ylab('Cuantiles empiricos') +
-  geom_abline(slope = 1, intercept = 0, col = 2, size = 1.5)
+  geom_abline(slope = 1, intercept = 0, col = 2, size = 1.5)+
+  labs(caption = "Gráfico 5)",title = "Residuos empiricos vs Residuos teoricos")
 
 
 # PRUEBA DE HIPOTESIS
@@ -421,7 +388,8 @@ ks.test(datos$t_i, 'pnorm') #No Rechazo H0) con un p-valor de 0.5317
 
 ggplot(qq, aes(x = empiricos, y=..density..)) +
   geom_histogram(breaks = seq(-3, 3, 1), col = 'white') +
-  xlab('Residuos studentizados')
+  xlab('Residuos studentizados')+
+  labs(caption = "Gráfico 6)",title = "Residuos externamente studentizados")
 ```
 
 
@@ -429,30 +397,53 @@ ggplot(qq, aes(x = empiricos, y=..density..)) +
 
 El modelo 2 cumple con todos los supuestos y es óptimo para realizar el análisis de inferencia y responder las preguntas de investigación. De todas formas, podemos llegar a la conclusión de que el aporte de las variables *Ancho_cm* y *Altura_cm* es marginal, conecntrando en *Longitud1* la mayor explicación de la varianza de los pesos.
 
-| Multiple R-squared (Mod2) | Multiple R-squared (Mod3) |
-|:-------:|:------:|
-| 0.994| 0.9225
+
+```{r}
+
+
+longitud_especie <- ggplot(datos, aes(x = log(Longitud1), y = log(Peso_gr), color=Especie)) + 
+  geom_point(alpha=0.5,size=2)+
+  theme_bw() +
+  xlab('Longitud') +
+  ylab('Peso')+
+  labs(title= "Gráficos de dispersión")+
+  theme(legend.position = "none")
+
+
+ancho_especie <- ggplot(datos, aes(x = log(Ancho_cm), y = log(Peso_gr), color=Especie)) + 
+  geom_point(alpha=0.5,size=2)+
+  theme_bw() +
+  xlab('Ancho') +
+  ylab('Peso')+
+  theme(legend.position = "none")
+
+altura_especie <- ggplot(datos, aes(x = log(Altura_cm), y = log(Peso_gr), color=Especie)) + 
+  geom_point(alpha=0.5,size=2)+
+  theme_bw() +
+  xlab('Alto') +
+  ylab('Peso')+
+  labs(caption = "Gráfico 6)")+
+  theme(legend.position = "none")
+
+
+grid.arrange(longitud_especie
+             ,ancho_especie
+             ,altura_especie,
+             ncol=1,nrow=3)
+
+```
+
 
 
 De esta manera, de aquí en más vamos a trabajar con el Modelo 3
 
-$$Log(Peso_i) = \beta_0\ + \beta_1Log(Longitud_1)\ +\epsilon_i $$
 
-```{r}
-
-summary(lm(formula = log(Peso_gr) ~ log(Longitud1) + log(Altura_cm) + log(Ancho_cm), data = datos))
-
-
-
-summary(lm(formula = log(Peso_gr) ~ log(Longitud1) , data = datos))
-
-```
 
 
 $$Log(Peso_{i}) = \beta_0\ + \beta_1Log(Longitud1_{i})\ \ +\ \epsilon_i$$
 
 
-```{r}
+```{r, echo=T}
 mod3 = lm(log(Peso_gr) ~ log(Longitud1) , data = datos)
 
 
@@ -479,14 +470,6 @@ Siguiendo el criterio del p_valor, la evidencia empirica sugiere que las variabl
 ## Signficacion global del modelo
 
 Siguiendo el criterio del p_valor, a un nivel del 5%, la evidencia empirica sugiere que el modelo es globalmente significativo. Esto implica que, dada la evidencia empirica con la que se cuenta, no es posible rechazar la hipotesis de que las variables explicativas usadas no contribuyen a explicar el peso del pez.
-
-
-
-
-
-
-
-
 
 
 ##Homoscedasticidad 
