@@ -334,7 +334,7 @@ ggplot(qq, aes(x = empiricos, y=..density..)) +
 ```
 
 
-## Modelo 2
+#### Modelo 2
 
 $$Log(Peso_i) = \beta_0\ + \beta_1Log(Longitud_1)\ + \beta_2Log(Altura_i)\  +  \beta_3Log(Ancho_{i}) +\epsilon_i $$
 
@@ -347,22 +347,13 @@ modelo_ajustado2 <- lm(log(Peso_gr) ~ log(Longitud1)+log(Altura_cm)+log(Ancho_cm
 
 
 
-## Diagnostico del modelo
-
-##Homoscedasticidad 
-
-En una primera instancia, se opto por recurrir  a un analisis visual de los residuos externamente estudientizados del modelo. 
-A continuacion vemos el grafico de los residuos en el eje de las ordenadas 
-Con un $\alpha=0.05$ rechazamos la hipotesis nula, por lo que podemos afirmar que no hay homoscedasticidad.
+##### Diagnostico del modelo
 
 
-## Normalidad 
-
-El histograma  de los residuos estandarizados parece no parecerse a  una distribucion  normal en los residuos.
-Ademas, los test de normalidad de Shapiro-Wilk y Jarque-Bera, segun el criterio del p_valor y para un $\alpha=0.5$ se rechaza la hipotesis nula de normalidad de los residuos.
 
 
-## Homoscedasticidad de "Modelo_ajustado2"
+
+####### Homoscedasticidad de "Modelo 2"
 
 ```{r}
 
@@ -378,7 +369,7 @@ datos$pred <- fitted(modelo_ajustado2)
 
 
 
-breusch_pagan(modelo_ajustado2) #No Rechazo H0) con p-valor de 0.73
+ #No Rechazo H0) con p-valor de 0.73
 
 
 ggplot(datos, aes(x = pred, y = t_i)) + 
@@ -392,13 +383,17 @@ ggplot(datos, aes(x = pred, y = t_i)) +
 
 #grid.arrange(crPlot(modelo,"Longitud1"),crPlot(modelo,"Altura_cm"),crPlot(modelo,"Ancho_cm"),ncol=3,nrow=1)
 
-
+breusch_pagan(modelo_ajustado2)
 
 
 
 ```
 
-##Normalidad
+
+###### Normalidad 
+
+El histograma  de los residuos estandarizados parece no parecerse a  una distribucion  normal en los residuos.
+Ademas, los test de normalidad de Shapiro-Wilk y Jarque-Bera, segun el criterio del p_valor y para un $\alpha=0.5$ se rechaza la hipotesis nula de normalidad de los residuos.
 
 ```{r}
 
@@ -430,7 +425,29 @@ ggplot(qq, aes(x = empiricos, y=..density..)) +
 ```
 
 
-# Modelo 3 (Justificar el quedarnos solo con longitud)
+#### Modelo 3 
+
+El modelo 2 cumple con todos los supuestos y es óptimo para realizar el análisis de inferencia y responder las preguntas de investigación. De todas formas, podemos llegar a la conclusión de que el aporte de las variables *Ancho_cm* y *Altura_cm* es marginal, conecntrando en *Longitud1* la mayor explicación de la varianza de los pesos.
+
+| Multiple R-squared (Mod2) | Multiple R-squared (Mod3) |
+|:-------:|:------:|
+| 0.994| 0.9225
+
+
+De esta manera, de aquí en más vamos a trabajar con el Modelo 3
+
+$$Log(Peso_i) = \beta_0\ + \beta_1Log(Longitud_1)\ +\epsilon_i $$
+
+```{r}
+
+summary(lm(formula = log(Peso_gr) ~ log(Longitud1) + log(Altura_cm) + log(Ancho_cm), data = datos))
+
+
+
+summary(lm(formula = log(Peso_gr) ~ log(Longitud1) , data = datos))
+
+```
+
 
 $$Log(Peso_{i}) = \beta_0\ + \beta_1Log(Longitud1_{i})\ \ +\ \epsilon_i$$
 
