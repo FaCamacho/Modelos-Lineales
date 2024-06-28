@@ -116,6 +116,14 @@ cuanti = datos %>%  select(2:7)
 
 matriz_correlacion <- cor(cuanti) 
 
+ggplot(datos,aes(y=Altura_cm)) + geom_boxplot(fill = "red",alpha=0.5,size=1) +xlab('Altura')
+
+
+grid.arrange(ggplot(datos,aes(y=Peso_gr)) + geom_boxplot(fill = "grey",alpha=0.5,size=1) +xlab('Peso')+ylab('Gramos'),
+             ggplot(datos,aes(y=Altura_cm)) + geom_boxplot(fill = "red",alpha=0.5,size=1) +xlab('Altura')+ylab('Centímetros'),
+             ggplot(datos,aes(y=Ancho_cm)) + geom_boxplot(fill = "blue",alpha=0.5,size=1) +xlab('Ancho')+ylab('Centímetros'),
+             ggplot(datos,aes(y=Longitud1)) + geom_boxplot(fill = "green",alpha=0.5,size=1) +xlab('Longitud1')+ylab('Centímetros')+labs(caption ="Gráfico) 1"),
+             ncol=4,nrow=1)
 
 
  p =ggcorrplot::ggcorrplot(
@@ -130,7 +138,7 @@ matriz_correlacion <- cor(cuanti)
       guides(
         fill = guide_colorbar(barheight = grid::unit(0.75, "npc"))
       )+
-   labs(title= "Correlacion entre variables" ,caption = "Grafico 1)")
+   labs(title= "Correlacion entre variables" ,caption = "Grafico 2)")
  
  p
 
