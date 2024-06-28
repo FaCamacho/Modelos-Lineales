@@ -1,5 +1,5 @@
 ---
-title: "Untitled"
+title: "Entrega final - Determinación del peso de los peces"
 output: html_document
 date: "2024-06-25"
 ---
@@ -14,10 +14,15 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE,warning = FALSE)
 ```
 
-```{r}
+
+
+
+
+
+```{r, warning=FALSE,message=FALSE}
 
 library(tidyverse)
 library(readxl)
@@ -33,74 +38,81 @@ library(boot)
 library(kableExtra)
 
 
+#Cargar los datos
+colores <- c("#003f5c", "#7a5195", "#ef5675", "#ffa600")
 
+
+datos <- read_excel("biometria_peces.xlsx")
 
 
 ```
 
-## Metodologia e introduccion 
 
-El objetivo de este trabajo es implementar las tecnicas de analisis  estudiadas en el curso de Modelos Lineales, en partiuclar, el modelo de regresion multiple.
-
-En una primera instancia, se procede a hacer un analisis explotatorio de los datos. 
-Luego pasamos a una primera etapa de diagnostico, donde  se procede a estudiar  el supuesto de la multicolinealidad aproximiada, en el cual nos sirve para quedarnos con las variables explicativas siguiendo el criterio de Vif<5.
-
-En la siguiente etapa, seleccionamos 3 posibles modelos, luego estudiamos el supuesto de homoscedasticidad en los residuos como tambien el test de normalidad 
-
-En una tercera instancia, se hizo un analisis ANOVA y ANCOVA. 
-
-Para finalizar, se usaron tecnicas como cross validation y leave-one-out para evalular los 3 modelos. 
+# Introducción
 
 
+A lo largo de este trabajo vamos a interpretar y modelar datos referentes a las dimensiones de peces de la costa de Finlandia. Las variables con las que contamos son su peso, longitud, ancho y altura, además de la especie de cada pez.
 
+El objetivo final es poder predecir el peso de los peces mediante las restantes variables, estas son:
 
-## Descripcion de la base
+| Variable | Descripción |
+|:-------:|:------:|
+| Especie| Bream, Parki, Perch, Pike, Roach, Smelt, Whitefish
+| Peso_gr| Peso del pez en gramos
+| Altura_cm| Altura en centímetros
+| Ancho_cm| Ancho en centímetros
+| Longitud1| Desde la nariz al comienzo de la cola
+| Longitud2| Desde la punta de la nariz hasta la muesca de la cola
+| Longitud3| Desde la nariz al final de la cola
 
-Para este informe se trabajo con una base de peces. La misma consta con 158 observaciones de peces y con las siguientes variables:
-
-La base de datos contiene información respecto de las siguientes variables:
-\begin{itemize}
-  \item Especie: Nombre de la especie del pescado
-  \item Peso_gr: Peso del pescado en gramos
-  \item LLongitud1: Longitud vertical en centímetros
-  \item Longitud2: Longitud diagonal en centímetros
-  \item Longitud3: Longitud transversal en centímetros
-  \item Altura_cm: Altura en centímetros
-  \item Ancho_cm: Ancho diagonal en centímetros
-\end{itemize}
+La base de datos cuenta con 159 peces donde uno de ellos será quitado de la misma por tenér un 0 en la varialbe de peso, consiguiendo finalmente un total de 158 peces.
 
 A efectos de tener un primer acercamiento con la estructura de los datos, se obtienen algunas estadisticas descripitvas, como la correlacion entre las variables cuantitativas   y un diagrama de caja para visualizar el peso en relacion a cada especie 
 
 
-```{r}
-#Cargar los datos
-colores <- c("#003f5c", "#7a5195", "#ef5675", "#ffa600")
-
-datos = biometria_peces
+# Metodologia
 
 
-```
+La idea es implementar las tecnicas de analisis estudiadas en el curso de Modelos Lineales, en partiuclar, el modelo de regresion multiple.
 
-## Aalisis exploratorio de los datos
+En una primera instancia, se procede a hacer un analisis explotatorio de los datos. 
+Luego pasamos a una primera etapa de diagnostico, dado que la intención es poder inferir en una generalidad de peces, hay ciertos supuestos que debemos asumir, estos son:
 
-```{r}
+* Multicolinealidad:
+  Donde nos va a interesar que ninguna variable sea combinación lineal del resto para no tener información          redundante
+
+* Homoscedasticidad:
+  Donde la varianza de los errores para cada pez son iguales.
+  
+* Normalidad:
+  Donde la distribución del peso de los peces tiene forma acampanada.
+  
+
+Para estudiar  el supuesto de la multicolinealidad aproximada, en el cual nos sirve para quedarnos con las variables explicativas siguiendo el criterio de Vif<5. Para la Homoscedasticidad vamos a aplicar el test de Bresuch-Pagan, y para la normalidad el test de Kolmogorov-Smirnov.
+
+
+Este analísis diagnóstico es aplicado para cada modelo candidato a responder nuestras inquietudes de investigación a efectos de encontrar el mejor, o en otras palabras el que pueda explicar en mayor medida la varianza.
+
+En una siguiente etapa, se hizo un analisis ANOVA y ANCOVA. Bajo la hípotesis de que hay modelos mejores que otros y variables que puedan explicar de mejor forma el peso de los peces, es que tendremos particular interés en ver como interactuan distintas variables, haciendolas complementarse entre sí.
+
+Para finalizar, se usaron tecnicas como cross validation y leave-one-out para evalular todos los modelos. 
+
+
+A efectos de tener un primer acercamiento con la estructura de los datos, se obtienen algunas estadisticas descripitvas, como la correlacion entre las variables cuantitativas   y un diagrama de caja para visualizar el peso en relacion a cada especie 
+
+
+# Resultados
+
+### Análisis exploratorio de los datos
+
+```{r, warning=FALSE,message=FALSE,echo = FALSE}
 
 
 str(datos)
 
 summary(datos)
 
-datos = datos %>%  mutate(Peso_gr = as.numeric(Peso_gr),Especie = as.factor(Especie))
-
-
-str(datos)
-
-summary(datos) #Hay un pez con peso 0 gr
-
-
-datos <- datos %>% filter(.,Peso_gr > 0)
-
-summary(datos) 
+datos = datos %>%  mutate(Peso_gr = as.numeric(Peso_gr),Especie = as.factor(Especie)) %>% filter(.,Peso_gr > 0)
 
 cuanti = datos %>%  select(2:7) 
 
@@ -118,7 +130,8 @@ matriz_correlacion <- cor(cuanti)
       ) + 
       guides(
         fill = guide_colorbar(barheight = grid::unit(0.75, "npc"))
-      )
+      )+
+   labs(caption = "Gráfico 1) Correlación entre variables cuantitativas")
  
  p
 
@@ -126,7 +139,7 @@ matriz_correlacion <- cor(cuanti)
 ```
 
 
-#Análisis gráfico
+### Análisis gráfico
 
 
 ```{r}
@@ -291,7 +304,7 @@ qq <- data.frame(teoricos = z_i,empiricos = sort(datos$t_i))
 
 shapiro.test(datos$t_i) #Rechazo H0) con un alpha al 5%
 tseries::jarque.bera.test(datos$t_i) #Rechazo H0) con un p-valor de 5%
-
+ks.test(datos$t_i, 'pnorm')
 
 ggplot(qq, aes(x = empiricos, y=..density..)) +
   geom_histogram(bins=10) +  
@@ -512,18 +525,18 @@ ggplot(qq, aes(x = empiricos, y=..density..)) +
 ```{r}
 
 
- bic1 = BIC(modelo)
-bic2= BIC(modelo_ajustado)
-bic3 = BIC(modelo_ajustado2)
-aic1 = AIC(modelo)
-aic2=AIC(modelo_ajustado)
-aic3= AIC(modelo_ajustado2)
+# bic1 = BIC(modelo)
+#bic2= BIC(modelo_ajustado)
+#bic3 = BIC(modelo_ajustado2)
+#aic1 = AIC(modelo)
+#aic2=AIC(modelo_ajustado)
+#aic3= AIC(modelo_ajustado2)
 
-summary(modelo)$adj.r.squared
+#summary(modelo)$adj.r.squared
 
-summary(modelo_ajustado)$adj.r.squared
+#summary(modelo_ajustado)$adj.r.squared
 
-summary(modelo_ajustado2)$adj.r.squared
+#summary(modelo_ajustado2)$adj.r.squared
 
 
 ```
@@ -754,16 +767,16 @@ with(datos,cor(Peso_gr,Longitud1))
 # Correlacion fuerte de 0.916
 
 
-crPlot(mod1.2, variable = 'log(Longitud1)', pch = 16)
+crPlot(mod2.1, variable = 'log(Longitud1)', pch = 16)
 
 #Homosedasticidad
 
 
-datos$t_i <- rstudent(mod1.2)
+datos$t_i <- rstudent(mod2.1)
 
-datos$pred <- fitted(mod1.2)
+datos$pred <- fitted(mod2.1)
 
-breusch_pagan(mod1.2) 
+breusch_pagan(mod2.1) 
 
 
 ggplot(datos, aes(x = pred, y = t_i)) + 
@@ -821,29 +834,29 @@ $$CV_{[n]}= \frac{1}{k}\sum_{i=1}^kECM_{i}$$
 
 
 ```{r}
-set.seed(84735)
+#set.seed(84735)
 
 
-glm.fit <- glm(mod1.1, data=datos) ## solo la constante ~ 1 
+#glm.fit <- glm(mod1.1, data=datos) ## solo la constante ~ 1 
 
-cv.err.kfold <- cv.glm(data=datos, glmfit=glm.fit, K=10) #Solo con la constante
-k1 = round(cv.err.kfold$delta[1],2)
-
-
-glm.fit2 = glm(mod1.0, data = datos)
-
-cv.err.kfold2 <- cv.glm(data=datos, glmfit=glm.fit2, K=10) #Con especie
-k2 = round(cv.err.kfold2$delta[1],2)
-?cv.glm
-glm.fit3 <- glm(mod2.1, data=datos)
-cv.err.kfold3 <- cv.glm(data=datos, glmfit=glm.fit3, K=10) #Con todo ( es decir con la covariable longitud1 y especie)
-k3=round(cv.err.kfold3$delta[1],2)
-
-df = data.frame(modelo = c("modelo 1", "modelo 2","modelo 3"), k_folds_cv = c(k1,k2,k3))
+#cv.err.kfold <- cv.glm(data=datos, glmfit=glm.fit, K=10) #Solo con la constante
+#k1 = round(cv.err.kfold$delta[1],2)
 
 
-df %>%  kable() %>%   kable_styling(font_size = 8, full_width = FALSE, latex_options = "HOLD_position") %>% 
-    kable_classic_2()
+#glm.fit2 = glm(mod1.0, data = datos)
+
+#cv.err.kfold2 <- cv.glm(data=datos, glmfit=glm.fit2, K=10) #Con especie
+#k2 = round(cv.err.kfold2$delta[1],2)
+#?cv.glm
+#glm.fit3 <- glm(mod2.1, data=datos)
+#cv.err.kfold3 <- cv.glm(data=datos, glmfit=glm.fit3, K=10) #Con todo ( es decir con la covariable longitud1 y especie)
+#k3=round(cv.err.kfold3$delta[1],2)
+
+#df = data.frame(modelo = c("modelo 1", "modelo 2","modelo 3"), k_folds_cv = c(k1,k2,k3))
+
+
+#df %>%  kable() %>%   kable_styling(font_size = 8, full_width = FALSE, latex_options = "HOLD_position") %>% 
+ #   kable_classic_2()
 
 
 
@@ -861,18 +874,17 @@ df %>%  kable() %>%   kable_styling(font_size = 8, full_width = FALSE, latex_opt
 #Predicción:
 
 
-n=nrow(datos)
+#n=nrow(datos)
 #Leave one out
 
 ## se rompe todo 
-pred<-rep(NA,n)
+#pred<-rep(NA,n)
 
-for(i in 1:n){
+#for(i in 1:n){
   
-  datos_i <- datos[-i,]
-  mod_i <- update(modelo, data= datos_i)
-  pred[i]<- (predict(mod_i,newdata=datos[i,])$pred)
-}
+  #datos_i <- datos[-i,]
+  #mod_i <- update(modelo, data= datos_i)
+  #pred[i]<- (predict(mod_i,newdata=datos[i,])$pred)}
 
 
 
