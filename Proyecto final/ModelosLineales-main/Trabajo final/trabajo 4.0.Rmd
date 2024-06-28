@@ -114,13 +114,13 @@ cuanti = datos %>%  select(2:7)
 
 matriz_correlacion <- cor(cuanti) 
 
-ggplot(datos,aes(y=Altura_cm)) + geom_boxplot(fill = "red",alpha=0.5,size=1) +xlab('Altura')
+ggplot(datos,aes(y=Altura_cm)) + geom_boxplot(fill = "red",alpha=0.5,size=1) +xlab('Altura')+labs(caption ="Gráfico) 1")
 
 
 grid.arrange(ggplot(datos,aes(y=Peso_gr)) + geom_boxplot(fill = "grey",alpha=0.5,size=1) +xlab('Peso')+ylab('Gramos'),
             ggplot(datos,aes(y=Altura_cm)) + geom_boxplot(fill = "red",alpha=0.5,size=1) +xlab('Altura')+ylab('Centímetros'),
            ggplot(datos,aes(y=Ancho_cm)) + geom_boxplot(fill = "blue",alpha=0.5,size=1) +xlab('Ancho')+ylab('Centímetros'),
-            ggplot(datos,aes(y=Longitud1)) + geom_boxplot(fill = "green",alpha=0.5,size=1) +xlab('Longitud1')+ylab('Centímetros')+labs(caption ="Gráfico) 1"),
+            ggplot(datos,aes(y=Longitud1)) + geom_boxplot(fill = "green",alpha=0.5,size=1) +xlab('Longitud1')+ylab('Centímetros')+labs(caption ="Gráfico) 2"),
              ncol=4,nrow=1)
 
 
@@ -136,7 +136,7 @@ grid.arrange(ggplot(datos,aes(y=Peso_gr)) + geom_boxplot(fill = "grey",alpha=0.5
       guides(
         fill = guide_colorbar(barheight = grid::unit(0.75, "npc"))
       )+
-   labs(title= "Correlacion entre variables" ,caption = "Grafico 2)")
+   labs(title= "Correlacion entre variables" ,caption = "Grafico 3)")
  
  p
 
@@ -186,12 +186,7 @@ En el primer paso de este análisis hallamos *vif* elevados en las distintas lon
 
 De esta forma las variables finales seran *Longitud1 , Altura_cm, Ancho_cm*
 
-
-
-
 ### Modelos
-
-
 
 #### Modelo 1 
 
@@ -230,10 +225,6 @@ datos$pred <- fitted(modelo)
 # H1) E(eps^2_i) = sigma^2 * h(X_1, X_2, ..., X_k)
 
 
-
-
-
-
 x0 = ggplot(datos, aes(x = pred, y = t_i)) + 
   geom_point(color = "red",alpha=0.5,size=1)+
   xlab('Predichos') +
@@ -252,9 +243,6 @@ grafico = function(variable) {
  geom_abline(slope=0, intercept=c(-1,1), linetype="dashed",color="blue") +  geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()
 }
 
-
-
-
 x1=grafico("Longitud1")
 x4=grafico("Altura_cm")
 x5= grafico("Ancho_cm")
@@ -263,7 +251,7 @@ x5= grafico("Ancho_cm")
 grid.arrange(x0,x1,x4,x5,ncol=2,nrow=2)
 
 
-breusch_pagan(modelo) # Rechazo H0) con p-valor del 5%
+breusch_pagan(modelo) # Rechazo H0) con p-valor de 1.873881e-17
 
 
 
@@ -276,6 +264,9 @@ El histograma  de los residuos externamente estudentizados no se parece a una di
 Ademas, los test de normalidad de Shapiro-Wilk y Jarque-Bera, segun el criterio del p_valor y para un $\alpha=0.5$ se rechaza la hipotesis nula de normalidad de los residuos.
 
 ```{r}
+
+#Yo lo sacaría este chunk ya que no pasamos el test de homoscedasticidad
+
 n <- nrow(datos)
 
 z_i <- qnorm(seq(n)/(n + 1))
@@ -295,14 +286,14 @@ tseries::jarque.bera.test(datos$t_i) #Rechazo H0) con un p-valor de 5%
 ks.test(datos$t_i, 'pnorm')
 
 ggplot(qq, aes(x = empiricos, y=..density..)) +
-  geom_histogram(bins=10) +  
+  geom_histogram(bins=10, col = 'white',fill="orange") +  
       theme(axis.title.y=element_blank(),
             axis.ticks.x=element_blank(),
             axis.ticks.y=element_blank(),
             axis.title.x=element_text(face="bold", size=12),
             plot.title=element_text(size=16, face="bold", hjust=0.5)) +
   xlab('Residuos studentizados')+
-  labs(caption = "Gráfico 3)",title = "Residuos externamente studentizados")
+  labs(caption = "Gráfico 5)",title = "Residuos externamente studentizados",subtitle = "Test de Kolmogorov-Smirnov = 0.006")
   
 ```
 
@@ -353,7 +344,7 @@ ggplot(datos, aes(x = pred, y = t_i)) +
   ylab('Residuos') +
  geom_abline(slope=0, intercept=c(-1,1), linetype="dashed",color="blue")+
   geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()+
-  labs(caption = "Gráfico 4)",title = "Residuos externamente estudentizados vs Predichos")
+  labs(caption = "Gráfico 6)",title = "Residuos externamente estudentizados vs Predichos", subtitle = "Breusch Pagan = 0.80")
 
 
 
@@ -379,13 +370,6 @@ z_i <- qnorm(seq(n)/(n + 1))
 
 qq <- data.frame(teoricos = z_i,empiricos = sort(datos$t_i))
 
-ggplot(qq, aes(x = teoricos, y = empiricos)) +
-  geom_point() +
-  xlab('Cuantiles teoricos') +
-  ylab('Cuantiles empiricos') +
-  geom_abline(slope = 1, intercept = 0, col = 2, size = 1.5)+
-  labs(caption = "Gráfico 5)",title = "Residuos empiricos vs Residuos teoricos")
-
 
 # PRUEBA DE HIPOTESIS
 # H0) Los errores son normales
@@ -396,10 +380,21 @@ shapiro.test(datos$t_i) #Rechazo H0) con un p-valor de 0.0049
 tseries::jarque.bera.test(datos$t_i) #Rechazo H0) con un p-valor de 1.794e-05
 ks.test(datos$t_i, 'pnorm') #No Rechazo H0) con un p-valor de 0.5317
 
+
+ggplot(qq, aes(x = teoricos, y = empiricos)) +
+  geom_point() +
+  xlab('Cuantiles teoricos') +
+  ylab('Cuantiles empiricos') +
+  geom_abline(slope = 1, intercept = 0, col = 2, size = 1.5)+
+  labs(caption = "Gráfico 7)",title = "Residuos empiricos vs Residuos teoricos",subtitle = "Test de Kolmogorov-Smirnov = 0.64")
+
+
+
+
 ggplot(qq, aes(x = empiricos, y=..density..)) +
-  geom_histogram(breaks = seq(-3, 3, 1), col = 'white') +
+  geom_histogram(breaks = seq(-3, 3, 1), col = 'white',fill="orange") +
   xlab('Residuos studentizados')+
-  labs(caption = "Gráfico 6)",title = "Residuos externamente studentizados")
+  labs(caption = "Gráfico 8)",title = "Residuos externamente studentizados", subtitle = "Test de Kolmogorov-Smirnov = 0.64")
 ```
 
 
@@ -437,7 +432,7 @@ altura_especie <- ggplot(datos, aes(x = log(Altura_cm), y = log(Peso_gr), color=
   theme_bw() +
   xlab('Alto') +
   ylab('Peso')+
-  labs(caption = "Gráfico 6)")+
+  labs(caption = "Gráfico 9)")+
   theme(legend.position = "none")
 
 
@@ -537,7 +532,7 @@ ggplot(datos, aes(x = pred, y = t_i)) +
   xlab('Predichos') +
   ylab('Residuos') +
  geom_abline(slope=0, intercept=c(-1,1), linetype="dashed",color="blue")+
-  geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()
+  geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()+labs(caption ="Gráfico) 10")
 
 ```
 
@@ -555,7 +550,7 @@ ggplot(qq, aes(x = teoricos, y = empiricos)) +
   geom_point() +
   xlab('Cuantiles teoricos') +
   ylab('Cuantiles empiricos') +
-  geom_abline(slope = 1, intercept = 0, col = 2, size = 1.5)
+  geom_abline(slope = 1, intercept = 0, col = 2, size = 1.5)+labs(caption ="Gráfico) 11")
 
 
 # PRUEBA DE HIPOTESIS
@@ -569,7 +564,7 @@ ks.test(datos$t_i, 'pnorm') #Rechazo H0) con un p-valor de 0.5317
 
 ggplot(qq, aes(x = empiricos, y=..density..)) +
   geom_histogram(breaks = seq(-3, 3, 1), col = 'white') +
-  xlab('Residuos studentizados')
+  xlab('Residuos studentizados')+labs(caption ="Gráfico) 12")
 ```
 
 
@@ -677,7 +672,7 @@ ggplot(datos, aes(x = pred, y = t_i)) +
   xlab('Predichos') +
   ylab('Residuos') +
  geom_abline(slope=0, intercept=c(-1,1), linetype="dashed",color="blue")+
-  geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()
+  geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()++labs(caption ="Gráfico) 13")
 
 
 
@@ -712,7 +707,7 @@ ks.test(datos$t_i, 'pnorm') #No Rechazo H0) con p-value = 0.8776
 
 ggplot(qq, aes(x = empiricos, y=..density..)) +
   geom_histogram(breaks = seq(-3, 3, 1), col = 'white') +
-  xlab('Residuos studentizados')
+  xlab('Residuos studentizados')+labs(caption ="Gráfico) 14")
 
 ```
 
@@ -781,7 +776,7 @@ ggplot(datos, aes(x =log(Longitud1) ,y=log(Peso_gr), col = Especie)) +
   geom_smooth(method = 'lm', se =FALSE, alpha=0.2, size=1)+
   xlab('Peso') + 
   ylab('Longitud') +  scale_color_brewer(palette="Dark2") + 
-  theme_bw()
+  theme_bw()+labs(caption ="Gráfico) 15")
   
 
 ```
@@ -822,7 +817,7 @@ ggplot(datos, aes(x = pred, y = t_i)) +
   xlab('Predichos') +
   ylab('Residuos') +
  geom_abline(slope=0, intercept=c(-1,1), linetype="dashed",color="blue")+
-  geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()
+  geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()++labs(caption ="Gráfico) 17")
 
 
 # Normalidad
@@ -837,7 +832,7 @@ ggplot(qq, aes(x = teoricos, y = empiricos)) +
   geom_point() +
   xlab('Cuantiles teoricos') +
   ylab('Cuantiles empiricos') +
-  geom_abline(slope = 1, intercept = 0, col = 2, size = 1.5)
+  geom_abline(slope = 1, intercept = 0, col = 2, size = 1.5)+labs(caption ="Gráfico) 18")
 
 
 # PRUEBA DE HIPOTESIS
@@ -851,7 +846,7 @@ ks.test(datos$t_i, 'pnorm') #No Rechazo H0) con p-value = 0.8061
 
 ggplot(qq, aes(x = empiricos, y=..density..)) +
   geom_histogram(breaks = seq(-3, 3, 1), col = 'white') +
-  xlab('Residuos studentizados')
+  xlab('Residuos studentizados')+labs(caption ="Gráfico) 19")
 
 
 
