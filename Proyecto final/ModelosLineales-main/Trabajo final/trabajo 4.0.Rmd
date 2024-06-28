@@ -24,7 +24,7 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE,warning = FALSE)
 
 ```{r, warning=FALSE,message=FALSE}
 
-library(tidyverse)
+library(tidyverse) 
 library(readxl)
 library(here)
 library(mixlm)
@@ -78,8 +78,6 @@ La idea es implementar las tecnicas de analisis estudiadas en el curso de Modelo
 En una primera instancia, se procede a hacer un analisis explotatorio de los datos. 
 Luego pasamos a una primera etapa de diagnostico, dado que la intención es poder inferir en una generalidad de peces, hay ciertos supuestos que debemos asumir, estos son:
 
-* Multicolinealidad:
-  Donde nos va a interesar que ninguna variable sea combinación lineal del resto para no tener información          redundante
 
 * Homoscedasticidad:
   Donde la varianza de los errores para cada pez son iguales.
@@ -120,9 +118,9 @@ ggplot(datos,aes(y=Altura_cm)) + geom_boxplot(fill = "red",alpha=0.5,size=1) +xl
 
 
 grid.arrange(ggplot(datos,aes(y=Peso_gr)) + geom_boxplot(fill = "grey",alpha=0.5,size=1) +xlab('Peso')+ylab('Gramos'),
-             ggplot(datos,aes(y=Altura_cm)) + geom_boxplot(fill = "red",alpha=0.5,size=1) +xlab('Altura')+ylab('Centímetros'),
-             ggplot(datos,aes(y=Ancho_cm)) + geom_boxplot(fill = "blue",alpha=0.5,size=1) +xlab('Ancho')+ylab('Centímetros'),
-             ggplot(datos,aes(y=Longitud1)) + geom_boxplot(fill = "green",alpha=0.5,size=1) +xlab('Longitud1')+ylab('Centímetros')+labs(caption ="Gráfico) 1"),
+            ggplot(datos,aes(y=Altura_cm)) + geom_boxplot(fill = "red",alpha=0.5,size=1) +xlab('Altura')+ylab('Centímetros'),
+           ggplot(datos,aes(y=Ancho_cm)) + geom_boxplot(fill = "blue",alpha=0.5,size=1) +xlab('Ancho')+ylab('Centímetros'),
+            ggplot(datos,aes(y=Longitud1)) + geom_boxplot(fill = "green",alpha=0.5,size=1) +xlab('Longitud1')+ylab('Centímetros')+labs(caption ="Gráfico) 1"),
              ncol=4,nrow=1)
 
 
@@ -311,6 +309,8 @@ ggplot(qq, aes(x = empiricos, y=..density..)) +
 
 #### Modelo 2
 
+Como segundo  modelo se estimo una regresion con transformacion logaritmica tanto en la variable dependiente como en la variablez explicativas
+
 $$Log(Peso_i) = \beta_0\ + \beta_1Log(Longitud_1)\ + \beta_2Log(Altura_i)\  +  \beta_3Log(Ancho_{i}) +\epsilon_i $$
 
 
@@ -403,6 +403,11 @@ ggplot(qq, aes(x = empiricos, y=..density..)) +
 ```
 
 
+<<<<<<< HEAD
+# Modelo 3 
+
+Finalmente por principio de parsimonia, nos quedamos con un modelo en el cual tiene una transformacion logaritmica tanto en la variable peso como en la variable predictora Longitud1. Dicho modelo supera los diagnosticos de homoscedasticidad y normalidad. 
+
 #### Modelo 3 
 
 El modelo 2 cumple con todos los supuestos y es óptimo para realizar el análisis de inferencia y responder las preguntas de investigación. De todas formas, podemos llegar a la conclusión de que el aporte de las variables *Ancho_cm* y *Altura_cm* es marginal, conecntrando en *Longitud1* la mayor explicación de la varianza de los pesos.
@@ -446,6 +451,7 @@ grid.arrange(longitud_especie
 
 
 De esta manera, de aquí en más vamos a trabajar con el Modelo 3
+>>>>>>> 45b75d9ed94d36fdbf4e5d77902e9bce08d364ac
 
 
 
@@ -453,8 +459,13 @@ De esta manera, de aquí en más vamos a trabajar con el Modelo 3
 $$Log(Peso_{i}) = \beta_0\ + \beta_1Log(Longitud1_{i})\ \ +\ \epsilon_i$$
 
 
+<<<<<<< HEAD
+```{r}
+mod3 = lm(log(Peso_gr) ~ log(Longitud1)  , data = datos)
+=======
 ```{r, echo=T}
 mod3 = lm(log(Peso_gr) ~ log(Longitud1) , data = datos)
+>>>>>>> 45b75d9ed94d36fdbf4e5d77902e9bce08d364ac
 
 
 
@@ -471,22 +482,41 @@ Para cada uno de las variables explicativas se realiza la siguiente prueba de hi
 
 $$H_0) B_{i} = 0\ vs\ H_1) B_{i} \neq 0$$
 
+```{r}
+summary(mod3)
+```
 
 
-Siguiendo el criterio del p_valor, la evidencia empirica sugiere que las variables  Longitud1 y Altura en centimetros son individualmente significativas para explicar el peos del pez a un nivel del5%.
+
+Podemos observar tambien que, la variable log(Longitud1) es significativa a 5%,  y que el modelo es globalmente significativo al 5%, mientras que todas las especies son significativas al 5%
 
 
 
 ## Signficacion global del modelo
 
-Siguiendo el criterio del p_valor, a un nivel del 5%, la evidencia empirica sugiere que el modelo es globalmente significativo. Esto implica que, dada la evidencia empirica con la que se cuenta, no es posible rechazar la hipotesis de que las variables explicativas usadas no contribuyen a explicar el peso del pez.
+
+Siguiendo el criterio del p_valor, a un nivel del 5%, la evidencia empirica sugiere que el modelo es globalmente significativo. Esto implica que, dada la evidencia empirica con la que se cuenta, no es posible rechazar la hipotesis de que la variable explicativa usada no contribuyen a explicar el peso del pez.
 
 
+<<<<<<< HEAD
+
+
+
+*Interpretacion del parametro*
+
+ $\hat{\beta_1}$ : Se estima que, ante un inremenento en un punto porcentual en la longitud1 del pez, el peso aumente en promedio 3.14 puntos porcentuales. 
+
+
+
+
+
+=======
+>>>>>>> 45b75d9ed94d36fdbf4e5d77902e9bce08d364ac
 ##Homoscedasticidad 
 
 
 ```{r}
-
+coef(mod3)
 
 # residuos
 
@@ -548,26 +578,6 @@ ggplot(qq, aes(x = empiricos, y=..density..)) +
 
 
 
-#evaluacion de modelo 
-
-```{r}
-
-
-# bic1 = BIC(modelo)
-#bic2= BIC(modelo_ajustado)
-#bic3 = BIC(modelo_ajustado2)
-#aic1 = AIC(modelo)
-#aic2=AIC(modelo_ajustado)
-#aic3= AIC(modelo_ajustado2)
-
-#summary(modelo)$adj.r.squared
-
-#summary(modelo_ajustado)$adj.r.squared
-
-#summary(modelo_ajustado2)$adj.r.squared
-
-
-```
 
 
 
@@ -862,29 +872,30 @@ $$CV_{[n]}= \frac{1}{k}\sum_{i=1}^kECM_{i}$$
 
 
 ```{r}
-#set.seed(84735)
+set.seed(84735)
 
 
-#glm.fit <- glm(mod1.1, data=datos) ## solo la constante ~ 1 
-
-#cv.err.kfold <- cv.glm(data=datos, glmfit=glm.fit, K=10) #Solo con la constante
-#k1 = round(cv.err.kfold$delta[1],2)
+glm.fit <- glm(mod1.1, data=datos) ## solo la constante ~ 1  
 
 
-#glm.fit2 = glm(mod1.0, data = datos)
-
-#cv.err.kfold2 <- cv.glm(data=datos, glmfit=glm.fit2, K=10) #Con especie
-#k2 = round(cv.err.kfold2$delta[1],2)
-#?cv.glm
-#glm.fit3 <- glm(mod2.1, data=datos)
-#cv.err.kfold3 <- cv.glm(data=datos, glmfit=glm.fit3, K=10) #Con todo ( es decir con la covariable longitud1 y especie)
-#k3=round(cv.err.kfold3$delta[1],2)
-
-#df = data.frame(modelo = c("modelo 1", "modelo 2","modelo 3"), k_folds_cv = c(k1,k2,k3))
+cv.err.kfold <- cv.glm(data=datos, glmfit=glm.fit, K=10) #Solo con la constante
+k1 = round(cv.err.kfold$delta[1],2)
 
 
-#df %>%  kable() %>%   kable_styling(font_size = 8, full_width = FALSE, latex_options = "HOLD_position") %>% 
- #   kable_classic_2()
+glm.fit2 = glm(mod1.0, data = datos)
+
+cv.err.kfold2 <- cv.glm(data=datos, glmfit=glm.fit2, K=10) #Con especie
+k2 = round(cv.err.kfold2$delta[1],2)
+?cv.glm
+glm.fit3 <- glm(mod2.1, data=datos)
+cv.err.kfold3 <- cv.glm(data=datos, glmfit=glm.fit3, K=10) #Con todo ( es decir con la covariable longitud1 y especie)
+k3=round(cv.err.kfold3$delta[1],2)
+
+df = data.frame(modelo = c("modelo 1", "modelo 2","modelo 3"), k_folds_cv = c(k1,k2,k3))
+
+
+df %>%  kable() %>%   kable_styling(font_size = 8, full_width = FALSE, latex_options = "HOLD_position") %>% 
+    kable_classic_2()
 
 
 
