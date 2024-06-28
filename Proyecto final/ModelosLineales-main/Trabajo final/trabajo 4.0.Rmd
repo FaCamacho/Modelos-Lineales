@@ -24,7 +24,7 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE,warning = FALSE)
 
 ```{r, warning=FALSE,message=FALSE}
 
-library(tidyverse)
+library(tidyverse) 
 library(readxl)
 library(here)
 library(mixlm)
@@ -78,8 +78,6 @@ La idea es implementar las tecnicas de analisis estudiadas en el curso de Modelo
 En una primera instancia, se procede a hacer un analisis explotatorio de los datos. 
 Luego pasamos a una primera etapa de diagnostico, dado que la intención es poder inferir en una generalidad de peces, hay ciertos supuestos que debemos asumir, estos son:
 
-* Multicolinealidad:
-  Donde nos va a interesar que ninguna variable sea combinación lineal del resto para no tener información          redundante
 
 * Homoscedasticidad:
   Donde la varianza de los errores para cada pez son iguales.
@@ -336,6 +334,8 @@ ggplot(qq, aes(x = empiricos, y=..density..)) +
 
 ## Modelo 2
 
+Como segundo  modelo se estimo una regresion con transformacion logaritmica tanto en la variable dependiente como en la variablez explicativas
+
 $$Log(Peso_i) = \beta_0\ + \beta_1Log(Longitud_1)\ + \beta_2Log(Altura_i)\  +  \beta_3Log(Ancho_{i}) +\epsilon_i $$
 
 
@@ -430,13 +430,18 @@ ggplot(qq, aes(x = empiricos, y=..density..)) +
 ```
 
 
-# Modelo 3 (Justificar el quedarnos solo con longitud)
+# Modelo 3 
+
+Finalmente por principio de parsimonia, nos quedamos con un modelo en el cual tiene una transformacion logaritmica tanto en la variable peso como en la variable predictora Longitud1. Dicho modelo supera los diagnosticos de homoscedasticidad y normalidad. Como tambien posee menor  AIC, BIC y el mayor  R^2 ajustado.
+
+
+
 
 $$Log(Peso_{i}) = \beta_0\ + \beta_1Log(Longitud1_{i})\ \ +\ \epsilon_i$$
 
 
 ```{r}
-mod3 = lm(log(Peso_gr) ~ log(Longitud1) , data = datos)
+mod3 = lm(log(Peso_gr) ~ log(Longitud1)  , data = datos)
 
 
 
@@ -455,18 +460,22 @@ $$H_0) B_{i} = 0\ vs\ H_1) B_{i} \neq 0$$
 
 
 
-Siguiendo el criterio del p_valor, la evidencia empirica sugiere que las variables  Longitud1 y Altura en centimetros son individualmente significativas para explicar el peos del pez a un nivel del5%.
+Podemos observar tambien que, la variable log(Longitud1) es significativa a 5%,  y que el modelo es globalmente significativo al 5%, mientras que todas las especies son significativas al 5%
 
 
 
 ## Signficacion global del modelo
 
-Siguiendo el criterio del p_valor, a un nivel del 5%, la evidencia empirica sugiere que el modelo es globalmente significativo. Esto implica que, dada la evidencia empirica con la que se cuenta, no es posible rechazar la hipotesis de que las variables explicativas usadas no contribuyen a explicar el peso del pez.
+
+Siguiendo el criterio del p_valor, a un nivel del 5%, la evidencia empirica sugiere que el modelo es globalmente significativo. Esto implica que, dada la evidencia empirica con la que se cuenta, no es posible rechazar la hipotesis de que la variable explicativa usada no contribuyen a explicar el peso del pez.
 
 
 
 
 
+*Interpretacion del parametro*
+
+ $\hat{\beta_1}$ : Se estima que, ante un inremenento en un punto porcentual en la longitud1 del pez, el peso aumente en promedio 3.14 puntos porcentuales. 
 
 
 
@@ -476,7 +485,7 @@ Siguiendo el criterio del p_valor, a un nivel del 5%, la evidencia empirica sugi
 
 
 ```{r}
-
+coef(mod3)
 
 # residuos
 
@@ -540,21 +549,26 @@ ggplot(qq, aes(x = empiricos, y=..density..)) +
 
 #evaluacion de modelo 
 
+Existen varios metodos para seleccionar entre distintos modelos, en la siguiente tabla se reportan el coeficiente$R^2$ ajustado, como tambien se reportan los criterios de informacion AIC y BIC 
+
 ```{r}
 
 
-# bic1 = BIC(modelo)
-#bic2= BIC(modelo_ajustado)
-#bic3 = BIC(modelo_ajustado2)
-#aic1 = AIC(modelo)
-#aic2=AIC(modelo_ajustado)
-#aic3= AIC(modelo_ajustado2)
+ bic1 = BIC(modelo)
+bic2= BIC(modelo_ajustado2)
+bic3 = BIC(mod3)
+aic1 = AIC(modelo)
+aic2=AIC(modelo_ajustado2)
+aic3= AIC(mod3)
 
-#summary(modelo)$adj.r.squared
+summary(modelo)$adj.r.squared
 
-#summary(modelo_ajustado)$adj.r.squared
+summary(modelo_ajustado2)$adj.r.squared
 
-#summary(modelo_ajustado2)$adj.r.squared
+summary(mod3)$adj.r.squared
+
+
+
 
 
 ```
