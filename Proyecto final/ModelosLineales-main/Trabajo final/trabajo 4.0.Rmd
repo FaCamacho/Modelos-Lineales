@@ -299,7 +299,7 @@ breusch_pagan(modelo)$p.value # Rechazo H0) con p-valor del 5%
 ```
 ## Normalidad 
 
-El histograma  de los residuos estandarizados parece no parecerse a  una distribucion  normal en los residuos.
+El histograma  de los residuos externamente estudentizados no se parece a una distribucion normal en los residuos.
 Ademas, los test de normalidad de Shapiro-Wilk y Jarque-Bera, segun el criterio del p_valor y para un $\alpha=0.5$ se rechaza la hipotesis nula de normalidad de los residuos.
 
 ```{r}
@@ -328,7 +328,9 @@ ggplot(qq, aes(x = empiricos, y=..density..)) +
             axis.ticks.y=element_blank(),
             axis.title.x=element_text(face="bold", size=12),
             plot.title=element_text(size=16, face="bold", hjust=0.5)) +
-  xlab('Residuos studentizados')
+  xlab('Residuos studentizados')+
+  labs(caption = "Gráfico 6)",title = "Residuos externamente estudentizados")
+  
 ```
 
 
@@ -338,6 +340,7 @@ $$Log(Peso_i) = \beta_0\ + \beta_1Log(Longitud_1)\ + \beta_2Log(Altura_i)\  +  \
 
 
 ```{r}
+
 modelo_ajustado2 <- lm(log(Peso_gr) ~ log(Longitud1)+log(Altura_cm)+log(Ancho_cm), data = datos)
 
 ```
