@@ -107,9 +107,6 @@ A efectos de tener un primer acercamiento con la estructura de los datos, se obt
 
 ```{r, warning=FALSE,message=FALSE,echo = FALSE}
 
-
-str(datos)
-
 summary(datos)
 
 datos = datos %>%  mutate(Peso_gr = as.numeric(Peso_gr),Especie = as.factor(Especie)) %>% filter(.,Peso_gr > 0)
@@ -131,7 +128,7 @@ matriz_correlacion <- cor(cuanti)
       guides(
         fill = guide_colorbar(barheight = grid::unit(0.75, "npc"))
       )+
-   labs(caption = "Gráfico 1) Correlación entre variables cuantitativas")
+   labs(title= "Correlacion entre variables" ,caption = "Grafico 1)")
  
  p
 
@@ -139,7 +136,7 @@ matriz_correlacion <- cor(cuanti)
 ```
 
 
-### Análisis gráfico
+
 
 
 ```{r}
@@ -151,20 +148,25 @@ longitud_especie <- ggplot(datos, aes(x = log(Longitud1), y = log(Peso_gr), colo
   geom_point(alpha=0.5,size=2)+
   theme_bw() +
   xlab('Longitud') +
-  ylab('Peso')
+  ylab('Peso')+
+  labs(title= "Gráficos de dispersión")+
+  theme(legend.position = "none")
 
 
 ancho_especie <- ggplot(datos, aes(x = log(Ancho_cm), y = log(Peso_gr), color=Especie)) + 
   geom_point(alpha=0.5,size=2)+
   theme_bw() +
   xlab('Ancho') +
-  ylab('Peso')
+  ylab('Peso')+
+  theme(legend.position = "none")
 
 altura_especie <- ggplot(datos, aes(x = log(Altura_cm), y = log(Peso_gr), color=Especie)) + 
   geom_point(alpha=0.5,size=2)+
   theme_bw() +
   xlab('Alto') +
-  ylab('Peso')
+  ylab('Peso')+
+   labs(caption = "Gráfico 4)")+
+  theme(legend.position = "none")
 
 
 grid.arrange(longitud_especie
@@ -175,8 +177,13 @@ grid.arrange(longitud_especie
 ```
 
 
-## Análisis de supuestos sobre modelos lineales
-#Multicolinealidad
+
+
+
+
+
+### Análisis de supuestos sobre modelos lineales
+#### Multicolinealidad
 ```{r}
 
 #Analizando multicolinealidad
@@ -199,13 +206,23 @@ vif(lm(Peso_gr~ .-Especie-Longitud2-Longitud3, data = datos))
 
 ```
 
-##Modelos
+En esta instancia analizamos la multicolinealidad, la idea es ver si hay variables que sean combinación lineal de otras, o sea, que en tengan la misma información. En caso de que el *vif* sea alto (mayor a 5), quitaremos la variable con el *vif* más alto.
+La presencia de multicolinealidad impide sobretodo la posibilidad de analizar el efecto de una variable predictora sobre lo que queremos predecir, en nuestro caso el peso.
+
+En el primer paso de este análisis hallamos *vif* elevados en las distintas longitudes, aquí volvemos confirmar lo estudiado en el análisis de correlación previo, donde las longitudes están altamente correlacionadas, lo cual indica que contar todas las medidas es inviable.
+
+De esta forma las variables finales seran *Longitud1 , Altura_cm, Ancho_cm*
 
 
 
-## Modelo 1 
 
-Como ya se menciono,el primer modelo estimado consiste en la regresion de la variable peso con las variables explicativas que fueron seleccionadas en el paso de multicolinealidad.
+### Modelos
+
+
+
+#### Modelo 1 
+
+Como ya se menciono,el primer modelo estimado consiste en la regresión de la variable peso con las variables explicativas que fueron seleccionadas en el paso de multicolinealidad.
 El modelo queda esepecificado como:
 
 $$peso_{i}=  \beta_0 +\ \beta_1Longitud1_{i} + \beta_2Altura_{i}\ +\beta_3Ancho_{i}\ +\ \epsilon_{i}$$
@@ -213,20 +230,17 @@ $$peso_{i}=  \beta_0 +\ \beta_1Longitud1_{i} + \beta_2Altura_{i}\ +\beta_3Ancho_
 
 ```{r}
 
-
 modelo <- lm(Peso_gr~ Longitud1+Altura_cm+Ancho_cm, data = datos)
-
-
 
 ```
 
-## Diagnostico del modelo
+##### Diagnostico del modelo
 
-##Homoscedasticidad 
+###### Homoscedasticidad 
 
-En una primera instancia, se opto por recurrir  a un analisis visual de los residuos externamente estudientizados del modelo. 
-A continuacion vemos el grafico de los residuos en el eje de las ordenadas 
-Con un $\alpha=0.05$ rechazamos la hipotesis nula, por lo que podemos afirmar que no hay homoscedasticidad.
+Aquí se opto por recurrir  a un análisis visual de los residuos externamente estudientizados del modelo. 
+A continuacion vemos el grafico de los residuos en el eje de las ordenadas. 
+Con un $\alpha=0.05$ rechazamos la hipotesis nula, por lo que podemos afirmar que no hay homoscedasticidad con un $p-valor < 0.0001$.
 
 
 $$ H_0)\ E(\epsilon_{i}^{2}) =  \sigma^2\ vs\ H_1)\ no\ H_0$$
@@ -244,7 +258,7 @@ datos$pred <- fitted(modelo)
 
 
 
-breusch_pagan(modelo) # Rechazo H0) con p-valor del 5%
+
 
 
 x0 = ggplot(datos, aes(x = pred, y = t_i)) + 
@@ -276,6 +290,7 @@ x5= grafico("Ancho_cm")
 grid.arrange(x0,x1,x4,x5,ncol=2,nrow=2)
 
 
+breusch_pagan(modelo)$p.value # Rechazo H0) con p-valor del 5%
 
 
 
