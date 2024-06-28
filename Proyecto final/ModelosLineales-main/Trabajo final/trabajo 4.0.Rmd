@@ -116,6 +116,8 @@ cuanti = datos %>%  select(2:7)
 
 matriz_correlacion <- cor(cuanti) 
 
+
+
  p =ggcorrplot::ggcorrplot(
         matriz_correlacion,
         method = "circle", 
