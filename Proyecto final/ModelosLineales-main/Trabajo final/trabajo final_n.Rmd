@@ -109,7 +109,6 @@ A efectos de tener un primer acercamiento con la estructura de los datos, se obt
 
 datos = datos %>%  mutate(Peso_gr = as.numeric(Peso_gr),Especie = as.factor(Especie)) %>% filter(.,Peso_gr > 0)
 
-#datos  %>% group_by(Especie) %>%summarise(across(.cols= c(Longitud1,Peso_gr), .fns = c(mean,min)))
 
 summary(datos) %>% kable() %>%   kable_styling(font_size = 8, full_width = T, latex_options = "HOLD_position") %>% kable_classic_2()
 
