@@ -112,6 +112,20 @@ datos = datos %>%  mutate(Peso_gr = as.numeric(Peso_gr),Especie = as.factor(Espe
 
 summary(datos) %>% kable() %>%   kable_styling(font_size = 8, full_width = T, latex_options = "HOLD_position") %>% kable_classic_2()
 
+resumen  =datos  %>% summarise(across(.cols= c(Longitud1,Peso_gr,Longitud2,Longitud3,Ancho_cm,Altura_cm), .fns = c(mean,min,max)))
+
+
+resumen <- resumen %>%
+  pivot_longer(
+    cols = everything(),
+    names_to = c(".value", "group"),
+    names_pattern = "(.)_(.)")  %>%
+  mutate(group = case_when(
+    group == "1" ~ "promedio",
+    group == "2" ~ "minimo",
+    group == "3" ~ "maximo"
+  ))
+
 cuanti = datos %>%  select(2:7) 
 
 
