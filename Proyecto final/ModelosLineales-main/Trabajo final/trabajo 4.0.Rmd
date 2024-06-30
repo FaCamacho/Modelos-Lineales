@@ -114,6 +114,16 @@ cuanti = datos %>%  select(2:7)
 
 matriz_correlacion <- cor(cuanti) 
 
+ggplot(datos,aes(y=Altura_cm)) + geom_boxplot(fill = "red",alpha=0.5,size=1) +xlab('Altura')
+
+
+grid.arrange(ggplot(datos,aes(y=Peso_gr)) + geom_boxplot(fill = "grey",alpha=0.5,size=1) +xlab('Peso')+ylab('Gramos'),
+            ggplot(datos,aes(y=Altura_cm)) + geom_boxplot(fill = "red",alpha=0.5,size=1) +xlab('Altura')+ylab('Centímetros'),
+           ggplot(datos,aes(y=Ancho_cm)) + geom_boxplot(fill = "blue",alpha=0.5,size=1) +xlab('Ancho')+ylab('Centímetros'),
+            ggplot(datos,aes(y=Longitud1)) + geom_boxplot(fill = "green",alpha=0.5,size=1) +xlab('Longitud1')+ylab('Centímetros')+labs(caption ="Gráfico) 1"),
+             ncol=4,nrow=1)
+
+
  p =ggcorrplot::ggcorrplot(
         matriz_correlacion,
         method = "circle", 
@@ -126,7 +136,7 @@ matriz_correlacion <- cor(cuanti)
       guides(
         fill = guide_colorbar(barheight = grid::unit(0.75, "npc"))
       )+
-   labs(title= "Correlacion entre variables" ,caption = "Grafico 1)")
+   labs(title= "Correlacion entre variables" ,caption = "Grafico 2)")
  
  p
 
@@ -137,42 +147,7 @@ matriz_correlacion <- cor(cuanti)
 
 
 
-```{r}
 
-
-
-
-longitud_especie <- ggplot(datos, aes(x = log(Longitud1), y = log(Peso_gr), color=Especie)) + 
-  geom_point(alpha=0.5,size=2)+
-  theme_bw() +
-  xlab('Longitud') +
-  ylab('Peso')+
-  labs(title= "Gráficos de dispersión")+
-  theme(legend.position = "none")
-
-
-ancho_especie <- ggplot(datos, aes(x = log(Ancho_cm), y = log(Peso_gr), color=Especie)) + 
-  geom_point(alpha=0.5,size=2)+
-  theme_bw() +
-  xlab('Ancho') +
-  ylab('Peso')+
-  theme(legend.position = "none")
-
-altura_especie <- ggplot(datos, aes(x = log(Altura_cm), y = log(Peso_gr), color=Especie)) + 
-  geom_point(alpha=0.5,size=2)+
-  theme_bw() +
-  xlab('Alto') +
-  ylab('Peso')+
-  labs(caption = "Gráfico 4)")+
-  theme(legend.position = "none")
-
-
-grid.arrange(longitud_especie
-             ,ancho_especie
-             ,altura_especie,
-             ncol=1,nrow=3)
-
-```
 
 
 
@@ -327,12 +302,12 @@ ggplot(qq, aes(x = empiricos, y=..density..)) +
             axis.title.x=element_text(face="bold", size=12),
             plot.title=element_text(size=16, face="bold", hjust=0.5)) +
   xlab('Residuos studentizados')+
-  labs(caption = "Gráfico 6)",title = "Residuos externamente estudentizados")
+  labs(caption = "Gráfico 3)",title = "Residuos externamente studentizados")
   
 ```
 
 
-## Modelo 2
+#### Modelo 2
 
 Como segundo  modelo se estimo una regresion con transformacion logaritmica tanto en la variable dependiente como en la variablez explicativas
 
@@ -347,22 +322,13 @@ modelo_ajustado2 <- lm(log(Peso_gr) ~ log(Longitud1)+log(Altura_cm)+log(Ancho_cm
 
 
 
-## Diagnostico del modelo
-
-##Homoscedasticidad 
-
-En una primera instancia, se opto por recurrir  a un analisis visual de los residuos externamente estudientizados del modelo. 
-A continuacion vemos el grafico de los residuos en el eje de las ordenadas 
-Con un $\alpha=0.05$ rechazamos la hipotesis nula, por lo que podemos afirmar que no hay homoscedasticidad.
+##### Diagnostico del modelo
 
 
-## Normalidad 
-
-El histograma  de los residuos estandarizados parece no parecerse a  una distribucion  normal en los residuos.
-Ademas, los test de normalidad de Shapiro-Wilk y Jarque-Bera, segun el criterio del p_valor y para un $\alpha=0.5$ se rechaza la hipotesis nula de normalidad de los residuos.
 
 
-## Homoscedasticidad de "Modelo_ajustado2"
+
+####### Homoscedasticidad de "Modelo 2"
 
 ```{r}
 
@@ -378,7 +344,7 @@ datos$pred <- fitted(modelo_ajustado2)
 
 
 
-breusch_pagan(modelo_ajustado2) #No Rechazo H0) con p-valor de 0.73
+ #No Rechazo H0) con p-valor de 0.73
 
 
 ggplot(datos, aes(x = pred, y = t_i)) + 
@@ -386,19 +352,24 @@ ggplot(datos, aes(x = pred, y = t_i)) +
   xlab('Predichos') +
   ylab('Residuos') +
  geom_abline(slope=0, intercept=c(-1,1), linetype="dashed",color="blue")+
-  geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()
+  geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()+
+  labs(caption = "Gráfico 4)",title = "Residuos externamente estudentizados vs Predichos")
 
 
 
 #grid.arrange(crPlot(modelo,"Longitud1"),crPlot(modelo,"Altura_cm"),crPlot(modelo,"Ancho_cm"),ncol=3,nrow=1)
 
-
+breusch_pagan(modelo_ajustado2)
 
 
 
 ```
 
-##Normalidad
+
+###### Normalidad 
+
+El histograma  de los residuos estandarizados parece no parecerse a  una distribucion  normal en los residuos.
+Ademas, los test de normalidad de Shapiro-Wilk y Jarque-Bera, segun el criterio del p_valor y para un $\alpha=0.5$ se rechaza la hipotesis nula de normalidad de los residuos.
 
 ```{r}
 
@@ -412,7 +383,8 @@ ggplot(qq, aes(x = teoricos, y = empiricos)) +
   geom_point() +
   xlab('Cuantiles teoricos') +
   ylab('Cuantiles empiricos') +
-  geom_abline(slope = 1, intercept = 0, col = 2, size = 1.5)
+  geom_abline(slope = 1, intercept = 0, col = 2, size = 1.5)+
+  labs(caption = "Gráfico 5)",title = "Residuos empiricos vs Residuos teoricos")
 
 
 # PRUEBA DE HIPOTESIS
@@ -426,13 +398,60 @@ ks.test(datos$t_i, 'pnorm') #No Rechazo H0) con un p-valor de 0.5317
 
 ggplot(qq, aes(x = empiricos, y=..density..)) +
   geom_histogram(breaks = seq(-3, 3, 1), col = 'white') +
-  xlab('Residuos studentizados')
+  xlab('Residuos studentizados')+
+  labs(caption = "Gráfico 6)",title = "Residuos externamente studentizados")
 ```
 
 
+<<<<<<< HEAD
 # Modelo 3 
 
-Finalmente por principio de parsimonia, nos quedamos con un modelo en el cual tiene una transformacion logaritmica tanto en la variable peso como en la variable predictora Longitud1. Dicho modelo supera los diagnosticos de homoscedasticidad y normalidad. Como tambien posee menor  AIC, BIC y el mayor  R^2 ajustado.
+Finalmente por principio de parsimonia, nos quedamos con un modelo en el cual tiene una transformacion logaritmica tanto en la variable peso como en la variable predictora Longitud1. Dicho modelo supera los diagnosticos de homoscedasticidad y normalidad. 
+
+#### Modelo 3 
+
+El modelo 2 cumple con todos los supuestos y es óptimo para realizar el análisis de inferencia y responder las preguntas de investigación. De todas formas, podemos llegar a la conclusión de que el aporte de las variables *Ancho_cm* y *Altura_cm* es marginal, conecntrando en *Longitud1* la mayor explicación de la varianza de los pesos.
+
+
+```{r}
+
+
+longitud_especie <- ggplot(datos, aes(x = log(Longitud1), y = log(Peso_gr), color=Especie)) + 
+  geom_point(alpha=0.5,size=2)+
+  theme_bw() +
+  xlab('Longitud') +
+  ylab('Peso')+
+  labs(title= "Gráficos de dispersión")+
+  theme(legend.position = "none")
+
+
+ancho_especie <- ggplot(datos, aes(x = log(Ancho_cm), y = log(Peso_gr), color=Especie)) + 
+  geom_point(alpha=0.5,size=2)+
+  theme_bw() +
+  xlab('Ancho') +
+  ylab('Peso')+
+  theme(legend.position = "none")
+
+altura_especie <- ggplot(datos, aes(x = log(Altura_cm), y = log(Peso_gr), color=Especie)) + 
+  geom_point(alpha=0.5,size=2)+
+  theme_bw() +
+  xlab('Alto') +
+  ylab('Peso')+
+  labs(caption = "Gráfico 6)")+
+  theme(legend.position = "none")
+
+
+grid.arrange(longitud_especie
+             ,ancho_especie
+             ,altura_especie,
+             ncol=1,nrow=3)
+
+```
+
+
+
+De esta manera, de aquí en más vamos a trabajar con el Modelo 3
+>>>>>>> 45b75d9ed94d36fdbf4e5d77902e9bce08d364ac
 
 
 
@@ -440,8 +459,13 @@ Finalmente por principio de parsimonia, nos quedamos con un modelo en el cual ti
 $$Log(Peso_{i}) = \beta_0\ + \beta_1Log(Longitud1_{i})\ \ +\ \epsilon_i$$
 
 
+<<<<<<< HEAD
 ```{r}
 mod3 = lm(log(Peso_gr) ~ log(Longitud1)  , data = datos)
+=======
+```{r, echo=T}
+mod3 = lm(log(Peso_gr) ~ log(Longitud1) , data = datos)
+>>>>>>> 45b75d9ed94d36fdbf4e5d77902e9bce08d364ac
 
 
 
@@ -458,6 +482,10 @@ Para cada uno de las variables explicativas se realiza la siguiente prueba de hi
 
 $$H_0) B_{i} = 0\ vs\ H_1) B_{i} \neq 0$$
 
+```{r}
+summary(mod3)
+```
+
 
 
 Podemos observar tambien que, la variable log(Longitud1) es significativa a 5%,  y que el modelo es globalmente significativo al 5%, mientras que todas las especies son significativas al 5%
@@ -470,6 +498,7 @@ Podemos observar tambien que, la variable log(Longitud1) es significativa a 5%, 
 Siguiendo el criterio del p_valor, a un nivel del 5%, la evidencia empirica sugiere que el modelo es globalmente significativo. Esto implica que, dada la evidencia empirica con la que se cuenta, no es posible rechazar la hipotesis de que la variable explicativa usada no contribuyen a explicar el peso del pez.
 
 
+<<<<<<< HEAD
 
 
 
@@ -481,6 +510,8 @@ Siguiendo el criterio del p_valor, a un nivel del 5%, la evidencia empirica sugi
 
 
 
+=======
+>>>>>>> 45b75d9ed94d36fdbf4e5d77902e9bce08d364ac
 ##Homoscedasticidad 
 
 
@@ -547,31 +578,6 @@ ggplot(qq, aes(x = empiricos, y=..density..)) +
 
 
 
-#evaluacion de modelo 
-
-Existen varios metodos para seleccionar entre distintos modelos, en la siguiente tabla se reportan el coeficiente$R^2$ ajustado, como tambien se reportan los criterios de informacion AIC y BIC 
-
-```{r}
-
-
- bic1 = BIC(modelo)
-bic2= BIC(modelo_ajustado2)
-bic3 = BIC(mod3)
-aic1 = AIC(modelo)
-aic2=AIC(modelo_ajustado2)
-aic3= AIC(mod3)
-
-summary(modelo)$adj.r.squared
-
-summary(modelo_ajustado2)$adj.r.squared
-
-summary(mod3)$adj.r.squared
-
-
-
-
-
-```
 
 
 
@@ -866,29 +872,30 @@ $$CV_{[n]}= \frac{1}{k}\sum_{i=1}^kECM_{i}$$
 
 
 ```{r}
-#set.seed(84735)
+set.seed(84735)
 
 
-#glm.fit <- glm(mod1.1, data=datos) ## solo la constante ~ 1 
-
-#cv.err.kfold <- cv.glm(data=datos, glmfit=glm.fit, K=10) #Solo con la constante
-#k1 = round(cv.err.kfold$delta[1],2)
+glm.fit <- glm(mod1.1, data=datos) ## solo la constante ~ 1  
 
 
-#glm.fit2 = glm(mod1.0, data = datos)
-
-#cv.err.kfold2 <- cv.glm(data=datos, glmfit=glm.fit2, K=10) #Con especie
-#k2 = round(cv.err.kfold2$delta[1],2)
-#?cv.glm
-#glm.fit3 <- glm(mod2.1, data=datos)
-#cv.err.kfold3 <- cv.glm(data=datos, glmfit=glm.fit3, K=10) #Con todo ( es decir con la covariable longitud1 y especie)
-#k3=round(cv.err.kfold3$delta[1],2)
-
-#df = data.frame(modelo = c("modelo 1", "modelo 2","modelo 3"), k_folds_cv = c(k1,k2,k3))
+cv.err.kfold <- cv.glm(data=datos, glmfit=glm.fit, K=10) #Solo con la constante
+k1 = round(cv.err.kfold$delta[1],2)
 
 
-#df %>%  kable() %>%   kable_styling(font_size = 8, full_width = FALSE, latex_options = "HOLD_position") %>% 
- #   kable_classic_2()
+glm.fit2 = glm(mod1.0, data = datos)
+
+cv.err.kfold2 <- cv.glm(data=datos, glmfit=glm.fit2, K=10) #Con especie
+k2 = round(cv.err.kfold2$delta[1],2)
+?cv.glm
+glm.fit3 <- glm(mod2.1, data=datos)
+cv.err.kfold3 <- cv.glm(data=datos, glmfit=glm.fit3, K=10) #Con todo ( es decir con la covariable longitud1 y especie)
+k3=round(cv.err.kfold3$delta[1],2)
+
+df = data.frame(modelo = c("modelo 1", "modelo 2","modelo 3"), k_folds_cv = c(k1,k2,k3))
+
+
+df %>%  kable() %>%   kable_styling(font_size = 8, full_width = FALSE, latex_options = "HOLD_position") %>% 
+    kable_classic_2()
 
 
 
