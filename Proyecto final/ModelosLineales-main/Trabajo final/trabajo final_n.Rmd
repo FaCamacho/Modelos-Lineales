@@ -107,8 +107,6 @@ A efectos de tener un primer acercamiento con la estructura de los datos, se obt
 
 ```{r,fig.width=9, fig.height=4.5, warning=FALSE,message=FALSE,echo = FALSE, fig.cap ="matriz de correlacion entre las variables cuantitativas."}
 
-
-
 datos = datos %>%  mutate(Peso_gr = as.numeric(Peso_gr),Especie = as.factor(Especie)) %>% filter(.,Peso_gr > 0)
 
 summary(datos) %>% kable() %>%   kable_styling(font_size = 8, full_width = FALSE, latex_options = "HOLD_position") %>% kable_classic_2()

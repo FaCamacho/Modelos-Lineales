@@ -1,0 +1,688 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Entrega final - Determinación del peso de los peces},
+  pdfauthor={Fabricio Camacho,Matias Bajac},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Entrega final - Determinación del peso de los peces}
+\author{Fabricio Camacho,Matias Bajac}
+\date{2024-06-25}
+
+\begin{document}
+\maketitle
+
+\section{Introducción}\label{introducciuxf3n}
+
+A lo largo de este trabajo vamos a interpretar y modelar datos
+referentes a las dimensiones de peces de la costa de Finlandia. Las
+variables con las que contamos son su peso, longitud, ancho y altura,
+además de la especie de cada pez.
+
+El objetivo final es poder predecir el peso de los peces mediante las
+restantes variables, estas son:
+
+\begin{longtable}[]{@{}cc@{}}
+\toprule\noalign{}
+Variable & Descripción \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Especie & Bream, Parki, Perch, Pike, Roach, Smelt, Whitefish \\
+Peso\_gr & Peso del pez en gramos \\
+Altura\_cm & Altura en centímetros \\
+Ancho\_cm & Ancho en centímetros \\
+Longitud1 & Desde la nariz al comienzo de la cola \\
+Longitud2 & Desde la punta de la nariz hasta la muesca de la cola \\
+Longitud3 & Desde la nariz al final de la cola \\
+\end{longtable}
+
+La base de datos cuenta con 159 peces donde uno de ellos será quitado de
+la misma por tenér un 0 en la varialbe de peso, consiguiendo finalmente
+un total de 158 peces.
+
+A efectos de tener un primer acercamiento con la estructura de los
+datos, se obtienen algunas estadisticas descripitvas, como la
+correlacion entre las variables cuantitativas y un diagrama de caja para
+visualizar el peso en relacion a cada especie
+
+\section{Metodologia}\label{metodologia}
+
+La idea es implementar las tecnicas de analisis estudiadas en el curso
+de Modelos Lineales, en partiuclar, el modelo de regresion multiple.
+
+En una primera instancia, se procede a hacer un analisis explotatorio de
+los datos. Luego pasamos a una primera etapa de diagnostico, dado que la
+intención es poder inferir en una generalidad de peces, hay ciertos
+supuestos que tenemos que validar , estos son:
+
+\begin{itemize}
+\item
+  Multicolinealidad: Donde nos va a interesar que ninguna variable sea
+  combinación lineal del resto.
+\item
+  Homoscedasticidad: Donde la varianza de los residuos para cada pez son
+  iguales.
+\item
+  Normalidad: Donde los residuos de los estimados tienen una
+  distribución normal.
+\end{itemize}
+
+Para estudiar el supuesto de la multicolinealidad aproximada, en el cual
+nos sirve para quedarnos con las variables explicativas siguiendo el
+criterio de Vif\textless5. Para la Homoscedasticidad vamos a aplicar el
+test de Bresuch-Pagan, y para la normalidad el test de
+Kolmogorov-Smirnov.
+
+Este analísis diagnóstico es aplicado para cada modelo candidato a
+responder nuestras inquietudes de investigación a efectos de encontrar
+el mejor, o en otras palabras el que pueda explicar en mayor medida la
+varianza.
+
+En una siguiente etapa, se hizo un analisis ANOVA y ANCOVA. Bajo la hi
+potesis de que hay modelos mejores que otros y variables que puedan
+explicar de mejor forma el peso de los peces, es que tendremos
+particular interés en ver como interactuan distintas variables,
+haciendolas complementarse entre sí.
+
+Para finalizar, se usaron técnicas de cross validation para evalular
+todos los modelos.
+
+A efectos de tener un primer acercamiento con la estructura de los
+datos, se obtienen algunas estadisticas descripitvas, como la
+correlacion entre las variables cuantitativas y un diagrama de caja para
+visualizar el peso en relación a cada especie
+
+\section{Resultados}\label{resultados}
+
+\subsection{Análisis exploratorio de los
+datos}\label{anuxe1lisis-exploratorio-de-los-datos}
+
+\begingroup\fontsize{8}{10}\selectfont
+
+\begin{longtable}[t]{llllllll}
+\toprule
+ & Especie & Peso\_gr & Longitud1 & Longitud2 & Longitud3 & Altura\_cm & Ancho\_cm\\
+\midrule
+ & Bream    :35 & Min.   :   5.9 & Min.   : 7.50 & Min.   : 8.40 & Min.   : 8.80 & Min.   :14.50 & Min.   : 8.70\\
+ & Parkki   :11 & 1st Qu.: 121.2 & 1st Qu.:19.15 & 1st Qu.:21.00 & 1st Qu.:23.20 & 1st Qu.:24.23 & 1st Qu.:13.40\\
+ & Perch    :56 & Median : 281.5 & Median :25.30 & Median :27.40 & Median :29.70 & Median :27.00 & Median :14.60\\
+ & Pike     :17 & Mean   : 400.8 & Mean   :26.29 & Mean   :28.47 & Mean   :31.28 & Mean   :28.31 & Mean   :14.11\\
+ & Roach    :19 & 3rd Qu.: 650.0 & 3rd Qu.:32.70 & 3rd Qu.:35.75 & 3rd Qu.:39.67 & 3rd Qu.:37.70 & 3rd Qu.:15.30\\
+\addlinespace
+ & Smelt    :14 & Max.   :1650.0 & Max.   :59.00 & Max.   :63.40 & Max.   :68.00 & Max.   :44.50 & Max.   :20.90\\
+ & Whitefish: 6 & NA & NA & NA & NA & NA & NA\\
+\bottomrule
+\end{longtable}
+\endgroup{}
+
+\begin{figure}
+\centering
+\includegraphics{trabajo-final_n_files/figure-latex/unnamed-chunk-2-1.pdf}
+\caption{matriz de correlacion entre las variables cuantitativas.}
+\end{figure}
+
+Podemos observar mediante la matriz de correlacion que existe
+correlacion fuerte entre las variables Longitud de los peces, lo que
+podria casuar problemas de multicolinealidad aproximada, como tambien
+problemas en la homoscedasticidad de la varianza de los residuos. Parece
+razonable a priori incluir solo una variable respecto a la longitud del
+pez para predecir su peso.
+
+\begin{figure}
+\centering
+\includegraphics{trabajo-final_n_files/figure-latex/unnamed-chunk-3-1.pdf}
+\caption{Diagrama de caja, relación entre cada especie y el peso}
+\end{figure}
+
+\section{Análisis gráfico}\label{anuxe1lisis-gruxe1fico}
+
+\begin{figure}
+\centering
+\includegraphics{trabajo-final_n_files/figure-latex/unnamed-chunk-4-1.pdf}
+\caption{Diagrama de dispresion de los regresores respecto al peso}
+\end{figure}
+
+\subsubsection{Análisis de supuestos sobre modelos
+lineales}\label{anuxe1lisis-de-supuestos-sobre-modelos-lineales}
+
+\paragraph{Multicolinealidad}\label{multicolinealidad}
+
+\begin{verbatim}
+##   Longitud1   Longitud2   Longitud3   Altura_cm    Ancho_cm 
+## 1817.971125 2391.862631  315.886137    4.724397    2.253745
+\end{verbatim}
+
+\begin{verbatim}
+##  Longitud1  Longitud3  Altura_cm   Ancho_cm 
+## 229.258810 233.347914   4.667798   1.812460
+\end{verbatim}
+
+\begin{verbatim}
+## Longitud1 Altura_cm  Ancho_cm 
+##  1.001651  1.258646  1.258136
+\end{verbatim}
+
+En esta instancia analizamos la multicolinealidad, la idea es ver si hay
+variables que sean combinación lineal de otras, o sea, que en tengan la
+misma información. En caso de que el \emph{vif} sea alto (mayor a 5),
+quitaremos la variable con el \emph{vif} más alto. La presencia de
+multicolinealidad impide sobretodo la posibilidad de analizar el efecto
+de una variable predictora sobre lo que queremos predecir, en nuestro
+caso el peso.
+
+En el primer paso de este análisis hallamos \emph{vif} elevados en las
+distintas longitudes, aquí volvemos confirmar lo estudiado en el
+análisis de correlación previo, donde las longitudes están altamente
+correlacionadas, lo cual indica que contar todas las medidas es
+inviable.
+
+\[VIF_{j} = \frac{1}{1-R^{2}_{j}}\]
+
+De esta forma las variables finales seran \emph{Longitud1 , Altura\_cm,
+Ancho\_cm}
+
+\subsubsection{Modelos}\label{modelos}
+
+\paragraph{Modelo 1}\label{modelo-1}
+
+Como ya se menciono,el primer modelo estimado consiste en la regresión
+de la variable peso con las variables explicativas que fueron
+seleccionadas en el paso de multicolinealidad. El modelo queda
+esepecificado como:
+
+\[peso_{i}=  \beta_0 +\ \beta_1Longitud1_{i} + \beta_2Altura_{i}\ +\beta_3Ancho_{i}\ +\ \epsilon_{i}\]
+
+\subparagraph{Diagnostico del modelo}\label{diagnostico-del-modelo}
+
+Homoscedasticidad
+
+Aquí se opto por recurrir a un análisis visual de los residuos
+externamente estudientizados del modelo. A continuacion vemos el grafico
+de los residuos en el eje de las ordenadas. Con un \(\alpha=0.05\)
+rechazamos la hipotesis nula, por lo que podemos afirmar que no hay
+homoscedasticidad con un \(p-valor < 0.0001\).
+
+\[H_0)\ E(\epsilon_{i}^{2}) =  \sigma^2\ vs\ H_1)\ no\ H_0\]
+
+\begin{figure}
+\centering
+\includegraphics{trabajo-final_n_files/figure-latex/unnamed-chunk-7-1.pdf}
+\caption{Análisis de los residuos externamente studientizados del modelo
+1}
+\end{figure}
+
+\begin{verbatim}
+## # A tibble: 1 x 5
+##   statistic  p.value parameter method                alternative
+##       <dbl>    <dbl>     <dbl> <chr>                 <chr>      
+## 1      81.0 1.87e-17         3 Koenker (studentised) greater
+\end{verbatim}
+
+\subsection{Normalidad}\label{normalidad}
+
+El histograma de los residuos externamente estudentizados no se parece a
+una distribucion normal en los residuos. Ademas, el test de normalidad
+de Kolmogorov-Smirnov, segun el criterio del p\_valor y para un
+\(\alpha=0.5\) se rechaza la hipotesis nula de normalidad de los
+residuos.
+
+El modelo queda descartado al no superar el supuesto de
+homoscedasticidad.
+
+\begin{verbatim}
+## 
+##  Jarque Bera Test
+## 
+## data:  datos$t_i
+## X-squared = 3.7807, df = 2, p-value = 0.151
+\end{verbatim}
+
+\begin{verbatim}
+## 
+##  Asymptotic one-sample Kolmogorov-Smirnov test
+## 
+## data:  datos$t_i
+## D = 0.13593, p-value = 0.005824
+## alternative hypothesis: two-sided
+\end{verbatim}
+
+\begin{figure}
+\centering
+\includegraphics{trabajo-final_n_files/figure-latex/unnamed-chunk-8-1.pdf}
+\caption{Histograma de los Residuos studientizados}
+\end{figure}
+
+\paragraph{Modelo 2}\label{modelo-2}
+
+Como segundo modelo se estimo una regresion con transformacion
+logaritmica tanto en la variable dependiente como en la variables
+explicativas
+
+\[Log(Peso_i) = \beta_0\ + \beta_1Log(Longitud_1)\ + \beta_2Log(Altura_i)\  +  \beta_3Log(Ancho_{i}) +\epsilon_i \]
+
+\subsection{Diagnostico del modelo}\label{diagnostico-del-modelo-1}
+
+\subsection{Homoscedasticidad}\label{homoscedasticidad-1}
+
+\includegraphics{trabajo-final_n_files/figure-latex/unnamed-chunk-10-1.pdf}
+
+Normalidad
+
+El histograma de los residuos estandarizados se parecerse a una
+distribucion normal en los residuos. Ademas, el test de normalidad de
+Kolmogorov-Smirnov , segun el criterio del p\_valor y para un
+\(\alpha=0.5\) no rechaza la hipotesis nula de normalidad de los
+residuos.
+
+\includegraphics{trabajo-final_n_files/figure-latex/unnamed-chunk-11-1.pdf}
+
+\begin{verbatim}
+## 
+##  Asymptotic one-sample Kolmogorov-Smirnov test
+## 
+## data:  datos$t_i
+## D = 0.059245, p-value = 0.6361
+## alternative hypothesis: two-sided
+\end{verbatim}
+
+\includegraphics{trabajo-final_n_files/figure-latex/unnamed-chunk-11-2.pdf}
+
+\paragraph{Modelo 3}\label{modelo-3}
+
+El modelo 3 cumple con todos los supuestos y es óptimo para realizar el
+análisis de inferencia y responder las preguntas de investigación. De
+todas formas, podemos llegar a la conclusión de que el aporte de las
+variables \emph{Ancho\_cm} y \emph{Altura\_cm} es marginal, conecntrando
+en \emph{Longitud1} la mayor explicación de la varianza de los pesos.
+Siendo este un modelo mas parsimonioso para poder explicar el peso de
+los peses.
+
+De esta manera, de aquí en más vamos a trabajar con el Modelo 3.
+
+\[Log(Peso_{i}) = \beta_0\ + \beta_1Log(Longitud1_{i})\ \ +\ \epsilon_i\]
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mod3 }\OtherTok{=} \FunctionTok{lm}\NormalTok{(}\FunctionTok{log}\NormalTok{(Peso\_gr) }\SpecialCharTok{\textasciitilde{}} \FunctionTok{log}\NormalTok{(Longitud1)  , }\AttributeTok{data =}\NormalTok{ datos)}
+
+
+
+\FunctionTok{summary}\NormalTok{(mod3)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = log(Peso_gr) ~ log(Longitud1), data = datos)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.90870 -0.07280  0.07773  0.26639  0.50636 
+## 
+## Coefficients:
+##                Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)    -4.62769    0.23481  -19.71   <2e-16 ***
+## log(Longitud1)  3.14394    0.07296   43.09   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## s: 0.3704 on 156 degrees of freedom
+## Multiple R-squared: 0.9225,
+## Adjusted R-squared: 0.922 
+## F-statistic:  1857 on 1 and 156 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+\subsection{Significacion individual}\label{significacion-individual}
+
+Para cada uno de las variables explicativas se realiza la siguiente
+prueba de hipotesis:
+
+\[H_0) B_{i} = 0\ vs\ H_1) B_{i} \neq 0\] Con región critica
+\(RC = \Big\{ \Big({X}{y}\Big) \, \Big/ \, |t| \geq t_{n-k-1} (1 - \, ^\alpha\!/_2) \Big\}\)
+
+Se usa el estadístico:
+\(t=\frac{\hat{\beta_i}}{\hat{V}\hat{(\beta_i)}}  \sim t_{n-k-1}\)\$
+
+Siguiendo el criterio del p\_valor, la evidencia empirica sugiere que
+las variables Longitud1 en centimetros es individualmente significativa
+para explicar el peos del pez a un nivel de confianza del 5\%.
+
+\subsection{Signficacion global del
+modelo}\label{signficacion-global-del-modelo}
+
+Siguiendo el criterio del p\_valor, a un nivel del 5\%, la evidencia
+empirica sugiere que el modelo es globalmente significativo. Esto
+implica que, dada la evidencia empirica con la que se cuenta, no es
+posible rechazar la hipotesis de que las variables explicativas usadas
+no contribuyen a explicar el peso del pez.
+
+\#\#Homoscedasticidad
+
+\begin{verbatim}
+## # A tibble: 1 x 5
+##   statistic p.value parameter method                alternative
+##       <dbl>   <dbl>     <dbl> <chr>                 <chr>      
+## 1     0.885   0.347         1 Koenker (studentised) greater
+\end{verbatim}
+
+\includegraphics{trabajo-final_n_files/figure-latex/fig-1.pdf}
+
+\subsection{Normalidad}\label{normalidad-2}
+
+\includegraphics{trabajo-final_n_files/figure-latex/unnamed-chunk-14-1.pdf}
+
+\begin{verbatim}
+## 
+##  Asymptotic one-sample Kolmogorov-Smirnov test
+## 
+## data:  datos$t_i
+## D = 0.18507, p-value = 3.984e-05
+## alternative hypothesis: two-sided
+\end{verbatim}
+
+\includegraphics{trabajo-final_n_files/figure-latex/unnamed-chunk-14-2.pdf}
+
+\subsection{ANOVA a 1 vía}\label{anova-a-1-vuxeda}
+
+El objetivo es estudiar si existe igualdad de medias entre las
+categorias de la variable Especie. Haciendo el analisis de varianza a
+una via, nos plantemos 2 modelos, uno solo con la constante y otro
+especificando la especie.
+
+El modelo con la constante queda especificado de la siguiente manera:
+
+\[Peso_{ij} = \mu + \epsilon_{ij}\]
+
+mieintras que si le agregamos el efecto especie queda:
+
+\[Peso_{ij} = \mu + Especie_{ij} +  \epsilon_{ij}\]
+
+A un nivel de significación del 5\%, podemos afirmar que tenemos
+evidencia suficiente para rechaza la hipotesis nula de igualdad de
+medias.
+
+\begingroup\fontsize{8}{10}\selectfont
+
+\begin{longtable}[t]{lrrrr}
+\toprule
+Especie & media(peso) & desvio(peso) & min(peso) & max(peso)\\
+\midrule
+Bream & 617.83 & 209.21 & 242.0 & 1000.0\\
+Parkki & 154.82 & 78.76 & 55.0 & 300.0\\
+Perch & 382.24 & 347.62 & 5.9 & 1100.0\\
+Pike & 718.71 & 494.14 & 200.0 & 1650.0\\
+Roach & 160.05 & 83.53 & 40.0 & 390.0\\
+\addlinespace
+Smelt & 11.18 & 4.13 & 6.7 & 19.9\\
+Whitefish & 531.00 & 309.60 & 270.0 & 1000.0\\
+\bottomrule
+\end{longtable}
+\endgroup{}
+
+\begin{verbatim}
+## Analysis of Variance Table
+## 
+## Response: log(Peso_gr)
+##            Df  Sum Sq Mean Sq F value    Pr(>F)    
+## Especie     6 187.941  31.323   53.64 < 2.2e-16 ***
+## Residuals 151  88.177   0.584                      
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\includegraphics{trabajo-final_n_files/figure-latex/unnamed-chunk-15-1.pdf}
+\includegraphics{trabajo-final_n_files/figure-latex/unnamed-chunk-15-2.pdf}
+
+\includegraphics{trabajo-final_n_files/figure-latex/unnamed-chunk-16-1.pdf}
+\includegraphics{trabajo-final_n_files/figure-latex/unnamed-chunk-16-2.pdf}
+
+\begin{verbatim}
+## 
+##  Asymptotic one-sample Kolmogorov-Smirnov test
+## 
+## data:  datos$t_i
+## D = 0.093715, p-value = 0.1246
+## alternative hypothesis: two-sided
+\end{verbatim}
+
+\includegraphics{trabajo-final_n_files/figure-latex/unnamed-chunk-16-3.pdf}
+
+\subsection{Ancova}\label{ancova}
+
+Sabiendo que la variable especie es significativo para predecir el peso
+de cada pez, vamos a plantearnos un modelo en el cual tenga una variable
+cuantitativa (longitud1) y la variable categorica Especie.
+
+\[Peso_i = \beta_0\ +\ \beta_1log(Longitud_i)\ +\beta_2Especie_i\  +\ \epsilon_i\]
+
+Luego, para ver si existe un efecto Especie sobre la pendiente, debemos
+plantearnos un modelo con interaccion. El modelo con interaccion queda
+definido como:
+
+\[Peso_i = \beta_0\ +\ \beta_1log(Longitud_i)\ +\beta_2Especie_i\ +\ \beta_3log(Longitud1_i):Especie_i\ +\ \epsilon_i\]
+
+Ahora pasamos a estudiar si efectivamente existe igualdad de pendientes
+entre las especies. No hay evidencia suficiente para decir que la
+pendiente sean distinta entre las especies.
+
+\[H_0) B_{i} = 0\ vs\ H_1) B_{i} \neq 0\]
+
+Se puede observar tambien mediante un grafico de puntos que existe una
+relacion lineal entre el peso y la longitud. Mas aun haciendo una
+transformacion logaritmica a ambas variables.
+
+Al plantearnos el modelo con la covariable longitud1 y especie , podemos
+ver que es suficiente para predecir el peso. Por lo que existe un efecto
+de la longitud y tambien un efecto de la especie.
+
+\begin{verbatim}
+## Analysis of Variance Table
+## 
+## Model 1: log(Peso_gr) ~ log(Longitud1) + Especie
+## Model 2: log(Peso_gr) ~ log(Longitud1) + Especie + log(Longitud1):Especie
+##   Res.Df    RSS Df Sum of Sq      F Pr(>F)
+## 1    150 2.0118                           
+## 2    144 1.9830  6  0.028848 0.3491 0.9095
+\end{verbatim}
+
+\includegraphics{trabajo-final_n_files/figure-latex/unnamed-chunk-17-1.pdf}
+
+No rechazamos \(H_0)\) por lo tanto vemos que las pendientes son iguales
+entre las especies con un nivel de significación del 5\%.
+
+\begin{verbatim}
+## [1] 0.9157195
+\end{verbatim}
+
+\includegraphics{trabajo-final_n_files/figure-latex/unnamed-chunk-18-1.pdf}
+
+\begin{verbatim}
+## # A tibble: 1 x 5
+##   statistic p.value parameter method                alternative
+##       <dbl>   <dbl>     <dbl> <chr>                 <chr>      
+## 1      2.60   0.919         7 Koenker (studentised) greater
+\end{verbatim}
+
+\includegraphics{trabajo-final_n_files/figure-latex/unnamed-chunk-18-2.pdf}
+\includegraphics{trabajo-final_n_files/figure-latex/unnamed-chunk-18-3.pdf}
+
+\begin{verbatim}
+## 
+##  Asymptotic one-sample Kolmogorov-Smirnov test
+## 
+## data:  datos$t_i
+## D = 0.05098, p-value = 0.8061
+## alternative hypothesis: two-sided
+\end{verbatim}
+
+\includegraphics{trabajo-final_n_files/figure-latex/unnamed-chunk-18-4.pdf}
+
+\subsection{Cross-Validation}\label{cross-validation}
+
+El objetivo de la validacion cruzada es separar primero la base en 2,
+una de testeo y otra de entrenamiento. Luego se usa esta ultima para
+estimar el modelo. Luego se utiliza el modelo para predecir la variable
+peso en la base de testeo. Por ultimo se calcula el ECM de dichas
+predicciones
+
+\[CV_{[n]}= \frac{1}{k}\sum_{i=1}^kECM_{i}\]
+
+\begingroup\fontsize{8}{10}\selectfont
+
+\begin{longtable}[t]{lr}
+\toprule
+modelo & k\_folds\_cv\\
+\midrule
+modelo 1 & 1.76\\
+modelo 2 & 0.60\\
+modelo 3 & 0.01\\
+\bottomrule
+\end{longtable}
+\endgroup{}
+
+\section{Conclusiones}\label{conclusiones}
+
+Mediante ensayo y error llegamos a la conclusion de que el modelo con
+una variable explicativa alcanza para poder predecir el peso de los
+peces, lo cual lo hace un modelo mas eficiente que la otra alternativa,
+por mas que el indicador del \(R^2\) ajustado sea mas chico que otro
+modelo con mas covariables, no es determinante para no quedarnos con
+este modelo.
+
+Como era de esperarse, al hacer el analisis de varianza a una via,
+podemos afirmar que existe diferencia de medias entre los grupos, siendo
+especie una buena variable para distinguir el peso de los peces.
+
+En tanto al analisis de covarianza (ANCOVA), vimos que las covariables
+longitud y especie, son buenas predictoras para predecir el peso, y no
+importa la interaccion entre ellas.
+
+\end{document}
