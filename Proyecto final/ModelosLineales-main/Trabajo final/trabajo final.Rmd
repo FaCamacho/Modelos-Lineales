@@ -1,5 +1,6 @@
 ---
 title: "Entrega final - Determinación del peso de los peces"
+<<<<<<< HEAD
 author: "Fabricio Camacho,Matias Bajac"
 output:
   pdf_document: default
@@ -8,6 +9,21 @@ date: '2024-06-25'
 ---
 
 
+=======
+output: html_document
+date: "2024-06-25"
+---
+
+---
+title: "Trabajo final"
+author: "matias"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE,warning = FALSE)
 ```
@@ -31,17 +47,25 @@ library(tseries)
 library(emmeans)
 library(boot) 
 library(kableExtra)
+<<<<<<< HEAD
 library(xtable)
+=======
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 
 
 #Cargar los datos
 colores <- c("#003f5c", "#7a5195", "#ef5675", "#ffa600")
 
+<<<<<<< HEAD
 datos <- read_excel(here("Proyecto final/ModelosLineales-main/Datos/biometria_peces.xlsx"))
 
 
 
 
+=======
+
+datos <- read_excel("biometria_peces.xlsx")
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 
 
 ```
@@ -75,6 +99,7 @@ A efectos de tener un primer acercamiento con la estructura de los datos, se obt
 La idea es implementar las tecnicas de analisis estudiadas en el curso de Modelos Lineales, en partiuclar, el modelo de regresion multiple.
 
 En una primera instancia, se procede a hacer un analisis explotatorio de los datos. 
+<<<<<<< HEAD
 Luego pasamos a una primera etapa de diagnostico, dado que la intención es poder inferir en una generalidad de peces, hay ciertos supuestos que tenemos que validar , estos son:
 
 * Multicolinealidad:
@@ -85,6 +110,18 @@ Luego pasamos a una primera etapa de diagnostico, dado que la intención es pode
   
 * Normalidad:
   Donde  los residuos de los estimados tienen una  distribución normal.
+=======
+Luego pasamos a una primera etapa de diagnostico, dado que la intención es poder inferir en una generalidad de peces, hay ciertos supuestos que debemos asumir, estos son:
+
+* Multicolinealidad:
+  Donde nos va a interesar que ninguna variable sea combinación lineal del resto para no tener información          redundante
+
+* Homoscedasticidad:
+  Donde la varianza de los errores para cada pez son iguales.
+  
+* Normalidad:
+  Donde la distribución del peso de los peces tiene forma acampanada.
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
   
 
 Para estudiar  el supuesto de la multicolinealidad aproximada, en el cual nos sirve para quedarnos con las variables explicativas siguiendo el criterio de Vif<5. Para la Homoscedasticidad vamos a aplicar el test de Bresuch-Pagan, y para la normalidad el test de Kolmogorov-Smirnov.
@@ -92,6 +129,7 @@ Para estudiar  el supuesto de la multicolinealidad aproximada, en el cual nos si
 
 Este analísis diagnóstico es aplicado para cada modelo candidato a responder nuestras inquietudes de investigación a efectos de encontrar el mejor, o en otras palabras el que pueda explicar en mayor medida la varianza.
 
+<<<<<<< HEAD
 En una siguiente etapa, se hizo un analisis ANOVA y ANCOVA. Bajo la hi
 potesis de que hay modelos mejores que otros y variables que puedan explicar de mejor forma el peso de los peces, es que tendremos particular interés en ver como interactuan distintas variables, haciendolas complementarse entre sí.
 
@@ -99,13 +137,27 @@ Para finalizar, se usaron técnicas de  cross validation para evalular todos los
 
 
 A efectos de tener un primer acercamiento con la estructura de los datos, se obtienen algunas estadisticas descripitvas, como la correlacion entre las variables cuantitativas   y un diagrama de caja para visualizar el peso en relación a cada especie 
+=======
+En una siguiente etapa, se hizo un analisis ANOVA y ANCOVA. Bajo la hípotesis de que hay modelos mejores que otros y variables que puedan explicar de mejor forma el peso de los peces, es que tendremos particular interés en ver como interactuan distintas variables, haciendolas complementarse entre sí.
+
+Para finalizar, se usaron tecnicas como cross validation y leave-one-out para evalular todos los modelos. 
+
+
+A efectos de tener un primer acercamiento con la estructura de los datos, se obtienen algunas estadisticas descripitvas, como la correlacion entre las variables cuantitativas   y un diagrama de caja para visualizar el peso en relacion a cada especie 
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 
 
 # Resultados
 
+<<<<<<< HEAD
 ## Análisis exploratorio de los datos
 
 ```{r,fig.width=9, fig.height=4.5, warning=FALSE,message=FALSE,echo = FALSE, fig.cap ="matriz de correlacion entre las variables cuantitativas."}
+=======
+### Análisis exploratorio de los datos
+
+```{r, warning=FALSE,message=FALSE,echo = FALSE}
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 
 summary(datos)
 
@@ -116,8 +168,20 @@ cuanti = datos %>%  select(2:7)
 
 matriz_correlacion <- cor(cuanti) 
 
+<<<<<<< HEAD
 
 
+=======
+ggplot(datos,aes(y=Altura_cm)) + geom_boxplot(fill = "red",alpha=0.5,size=1) +xlab('Altura')
+
+
+grid.arrange(ggplot(datos,aes(y=Peso_gr)) + geom_boxplot(fill = "grey",alpha=0.5,size=1) +xlab('Peso')+ylab('Gramos'),
+             ggplot(datos,aes(y=Altura_cm)) + geom_boxplot(fill = "red",alpha=0.5,size=1) +xlab('Altura')+ylab('Centímetros'),
+             ggplot(datos,aes(y=Ancho_cm)) + geom_boxplot(fill = "blue",alpha=0.5,size=1) +xlab('Ancho')+ylab('Centímetros'),
+             ggplot(datos,aes(y=Longitud1)) + geom_boxplot(fill = "green",alpha=0.5,size=1) +xlab('Longitud1')+ylab('Centímetros')+labs(caption ="Gráfico) 1"),
+             ncol=4,nrow=1)
+
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 
  p =ggcorrplot::ggcorrplot(
         matriz_correlacion,
@@ -138,6 +202,7 @@ matriz_correlacion <- cor(cuanti)
 
 ```
 
+<<<<<<< HEAD
 Podemos observar mediante la matriz de correlacion que existe  correlacion fuerte entre las  variables Longitud de los peces, lo que podria casuar problemas de multicolinealidad aproximada, como tambien problemas en  la homoscedasticidad de la varianza de los residuos. Parece razonable a priori incluir solo una variable respecto a la longitud del pez para predecir su peso.
 
 
@@ -181,6 +246,14 @@ grid.arrange(longitud_especie
              ncol=1,nrow=3)
 
 ```
+=======
+
+
+
+
+
+
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 
 
 
@@ -214,11 +287,16 @@ vif(lm(Peso_gr~ .-Especie-Longitud2-Longitud3, data = datos))
 En esta instancia analizamos la multicolinealidad, la idea es ver si hay variables que sean combinación lineal de otras, o sea, que en tengan la misma información. En caso de que el *vif* sea alto (mayor a 5), quitaremos la variable con el *vif* más alto.
 La presencia de multicolinealidad impide sobretodo la posibilidad de analizar el efecto de una variable predictora sobre lo que queremos predecir, en nuestro caso el peso.
 
+<<<<<<< HEAD
 
 En el primer paso de este análisis hallamos *vif* elevados en las distintas longitudes, aquí volvemos confirmar lo estudiado en el análisis de correlación previo, donde las longitudes están altamente correlacionadas, lo cual indica que contar todas las medidas es inviable.
 
 $$VIF_{j} = \frac{1}{1-R^{2}_{j}}$$
 
+=======
+En el primer paso de este análisis hallamos *vif* elevados en las distintas longitudes, aquí volvemos confirmar lo estudiado en el análisis de correlación previo, donde las longitudes están altamente correlacionadas, lo cual indica que contar todas las medidas es inviable.
+
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 De esta forma las variables finales seran *Longitud1 , Altura_cm, Ancho_cm*
 
 
@@ -251,10 +329,16 @@ A continuacion vemos el grafico de los residuos en el eje de las ordenadas.
 Con un $\alpha=0.05$ rechazamos la hipotesis nula, por lo que podemos afirmar que no hay homoscedasticidad con un $p-valor < 0.0001$.
 
 
+<<<<<<< HEAD
 
 $$H_0)\ E(\epsilon_{i}^{2}) =  \sigma^2\ vs\ H_1)\ no\ H_0$$
 
 ```{r, fig.cap= "Análisis de los residuos externamente studientizados del modelo 1"}
+=======
+$$ H_0)\ E(\epsilon_{i}^{2}) =  \sigma^2\ vs\ H_1)\ no\ H_0$$
+
+```{r}
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 
 # residuos
 
@@ -306,6 +390,7 @@ breusch_pagan(modelo) # Rechazo H0) con p-valor del 5%
 
 
 ```
+<<<<<<< HEAD
 ## Normalidad
 
 El histograma  de los residuos externamente estudentizados no se parece a una distribucion normal en los residuos.
@@ -314,6 +399,14 @@ Ademas, el   test de normalidad de Kolmogorov-Smirnov, segun el criterio del p_v
 El modelo queda descartado al  no superar el supuesto de homoscedasticidad.
 
 ```{r,fig.cap="Histograma de los Residuos studientizados"}
+=======
+## Normalidad 
+
+El histograma  de los residuos externamente estudentizados no se parece a una distribucion normal en los residuos.
+Ademas, los test de normalidad de Shapiro-Wilk y Jarque-Bera, segun el criterio del p_valor y para un $\alpha=0.5$ se rechaza la hipotesis nula de normalidad de los residuos.
+
+```{r}
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 n <- nrow(datos)
 
 z_i <- qnorm(seq(n)/(n + 1))
@@ -328,6 +421,7 @@ qq <- data.frame(teoricos = z_i,empiricos = sort(datos$t_i))
 # H1) Los errores NO son normales
 
 
+<<<<<<< HEAD
 #shapiro.test(datos$t_i) #Rechazo H0) con un alpha al 5%
 tseries::jarque.bera.test(datos$t_i) #Rechazo H0) con un p-valor de 5%
 ks.test(datos$t_i, 'pnorm')
@@ -335,20 +429,37 @@ ks.test(datos$t_i, 'pnorm')
 
 ggplot(qq, aes(x = empiricos, y=..density..)) +
   geom_histogram(bins=10, col = 'white',fill="orange") +  
+=======
+shapiro.test(datos$t_i) #Rechazo H0) con un alpha al 5%
+tseries::jarque.bera.test(datos$t_i) #Rechazo H0) con un p-valor de 5%
+ks.test(datos$t_i, 'pnorm')
+
+ggplot(qq, aes(x = empiricos, y=..density..)) +
+  geom_histogram(bins=10) +  
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
       theme(axis.title.y=element_blank(),
             axis.ticks.x=element_blank(),
             axis.ticks.y=element_blank(),
             axis.title.x=element_text(face="bold", size=12),
             plot.title=element_text(size=16, face="bold", hjust=0.5)) +
+<<<<<<< HEAD
   xlab('Residuos studentizados') +
   labs(subtitle = "Test de Kolmmogorov-Smirnov = 0.006")
+=======
+  xlab('Residuos studentizados')+
+  labs(caption = "Gráfico 3)",title = "Residuos externamente studentizados")
+  
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 ```
 
 
 #### Modelo 2
 
+<<<<<<< HEAD
 Como segundo  modelo se estimo una regresion con transformacion logaritmica tanto en la variable dependiente como en la variables  explicativas
 
+=======
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 $$Log(Peso_i) = \beta_0\ + \beta_1Log(Longitud_1)\ + \beta_2Log(Altura_i)\  +  \beta_3Log(Ancho_{i}) +\epsilon_i $$
 
 
@@ -360,10 +471,20 @@ modelo_ajustado2 <- lm(log(Peso_gr) ~ log(Longitud1)+log(Altura_cm)+log(Ancho_cm
 
 
 
+<<<<<<< HEAD
 ## Diagnostico del modelo
 
 
 ## Homoscedasticidad 
+=======
+##### Diagnostico del modelo
+
+
+
+
+
+####### Homoscedasticidad de "Modelo 2"
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 
 ```{r}
 
@@ -387,6 +508,7 @@ ggplot(datos, aes(x = pred, y = t_i)) +
   xlab('Predichos') +
   ylab('Residuos') +
  geom_abline(slope=0, intercept=c(-1,1), linetype="dashed",color="blue")+
+<<<<<<< HEAD
   geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw() +
  labs(caption = "Gráfico 6)",title = "Residuos externamente estudentizados vs Predichos", subtitle = "Breusch Pagan = 0.80")
 
@@ -395,6 +517,16 @@ ggplot(datos, aes(x = pred, y = t_i)) +
 
 
 #breusch_pagan(modelo_ajustado2)
+=======
+  geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()+
+  labs(caption = "Gráfico 4)",title = "Residuos externamente estudentizados vs Predichos")
+
+
+
+#grid.arrange(crPlot(modelo,"Longitud1"),crPlot(modelo,"Altura_cm"),crPlot(modelo,"Ancho_cm"),ncol=3,nrow=1)
+
+breusch_pagan(modelo_ajustado2)
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 
 
 
@@ -403,8 +535,13 @@ ggplot(datos, aes(x = pred, y = t_i)) +
 
 ###### Normalidad 
 
+<<<<<<< HEAD
 El histograma  de los residuos estandarizados se  parecerse a  una distribucion  normal en los residuos.
 Ademas, el  test de normalidad de Kolmogorov-Smirnov , segun el criterio del p_valor y para un $\alpha=0.5$ no  rechaza la hipotesis nula de normalidad de los residuos.
+=======
+El histograma  de los residuos estandarizados parece no parecerse a  una distribucion  normal en los residuos.
+Ademas, los test de normalidad de Shapiro-Wilk y Jarque-Bera, segun el criterio del p_valor y para un $\alpha=0.5$ se rechaza la hipotesis nula de normalidad de los residuos.
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 
 ```{r}
 
@@ -419,7 +556,11 @@ ggplot(qq, aes(x = teoricos, y = empiricos)) +
   xlab('Cuantiles teoricos') +
   ylab('Cuantiles empiricos') +
   geom_abline(slope = 1, intercept = 0, col = 2, size = 1.5)+
+<<<<<<< HEAD
   labs(caption = "Gráfico 7)",title = "Residuos empiricos vs Residuos teoricos",subtitle = "Test de Kolmogorov-Smirnov = 0.64")
+=======
+  labs(caption = "Gráfico 5)",title = "Residuos empiricos vs Residuos teoricos")
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 
 
 # PRUEBA DE HIPOTESIS
@@ -427,21 +568,39 @@ ggplot(qq, aes(x = teoricos, y = empiricos)) +
 # H1) Los errores NO son normales
 
 
+<<<<<<< HEAD
 ks.test(datos$t_i, 'pnorm') #No Rechazo H0) 
  ggplot(qq, aes(x = empiricos, y=..density..)) +
   geom_histogram(breaks = seq(-3, 3, 1), col = 'white',fill="orange") +
   xlab('Residuos studentizados')+
   labs(caption = "Gráfico 8)",title = "Residuos externamente studentizados", subtitle = "Test de Kolmogorov-Smirnov = 0.64")
+=======
+shapiro.test(datos$t_i) #Rechazo H0) con un p-valor de 0.0049
+tseries::jarque.bera.test(datos$t_i) #Rechazo H0) con un p-valor de 1.794e-05
+ks.test(datos$t_i, 'pnorm') #No Rechazo H0) con un p-valor de 0.5317
+
+ggplot(qq, aes(x = empiricos, y=..density..)) +
+  geom_histogram(breaks = seq(-3, 3, 1), col = 'white') +
+  xlab('Residuos studentizados')+
+  labs(caption = "Gráfico 6)",title = "Residuos externamente studentizados")
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 ```
 
 
 #### Modelo 3 
 
+<<<<<<< HEAD
 El modelo 3 cumple con todos los supuestos y es óptimo para realizar el análisis de inferencia y responder las preguntas de investigación. De todas formas, podemos llegar a la conclusión de que el aporte de las variables *Ancho_cm* y *Altura_cm* es marginal, conecntrando en *Longitud1* la mayor explicación de la varianza de los pesos.
 Siendo este un modelo mas parsimonioso para poder explicar el peso de los peses. 
 
 
 ```{r, fig.cap = relacion lineal  entre la variable explicativa Longitud1 y Peso segun Especie"}
+=======
+El modelo 2 cumple con todos los supuestos y es óptimo para realizar el análisis de inferencia y responder las preguntas de investigación. De todas formas, podemos llegar a la conclusión de que el aporte de las variables *Ancho_cm* y *Altura_cm* es marginal, conecntrando en *Longitud1* la mayor explicación de la varianza de los pesos.
+
+
+```{r}
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 
 
 longitud_especie <- ggplot(datos, aes(x = log(Longitud1), y = log(Peso_gr), color=Especie)) + 
@@ -453,12 +612,39 @@ longitud_especie <- ggplot(datos, aes(x = log(Longitud1), y = log(Peso_gr), colo
   theme(legend.position = "none")
 
 
+<<<<<<< HEAD
+=======
+ancho_especie <- ggplot(datos, aes(x = log(Ancho_cm), y = log(Peso_gr), color=Especie)) + 
+  geom_point(alpha=0.5,size=2)+
+  theme_bw() +
+  xlab('Ancho') +
+  ylab('Peso')+
+  theme(legend.position = "none")
+
+altura_especie <- ggplot(datos, aes(x = log(Altura_cm), y = log(Peso_gr), color=Especie)) + 
+  geom_point(alpha=0.5,size=2)+
+  theme_bw() +
+  xlab('Alto') +
+  ylab('Peso')+
+  labs(caption = "Gráfico 6)")+
+  theme(legend.position = "none")
+
+
+grid.arrange(longitud_especie
+             ,ancho_especie
+             ,altura_especie,
+             ncol=1,nrow=3)
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 
 ```
 
 
 
+<<<<<<< HEAD
 De esta manera, de aquí en más vamos a trabajar con el Modelo 3.
+=======
+De esta manera, de aquí en más vamos a trabajar con el Modelo 3
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 
 
 
@@ -467,7 +653,11 @@ $$Log(Peso_{i}) = \beta_0\ + \beta_1Log(Longitud1_{i})\ \ +\ \epsilon_i$$
 
 
 ```{r, echo=T}
+<<<<<<< HEAD
 mod3 = lm(log(Peso_gr) ~ log(Longitud1)  , data = datos)
+=======
+mod3 = lm(log(Peso_gr) ~ log(Longitud1) , data = datos)
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 
 
 
@@ -483,6 +673,7 @@ summary(mod3)
 Para cada uno de las variables explicativas se realiza la siguiente prueba de hipotesis:
 
 $$H_0) B_{i} = 0\ vs\ H_1) B_{i} \neq 0$$
+<<<<<<< HEAD
 Con región critica $RC = \Big\{ \Big({X}{y}\Big) \, \Big/ \, |t| \geq t_{n-k-1} (1 - \, ^\alpha\!/_2) \Big\}$
 
 
@@ -491,6 +682,12 @@ Se usa el estadístico:  $t=\frac{\hat{\beta_i}}{\hat{V}\hat{(\beta_i)}}  \sim t
 
 
 Siguiendo el criterio del p_valor, la evidencia empirica sugiere que las variables  Longitud1  en centimetros es individualmente significativa para explicar el peos del pez a un nivel de confianza del 5%.
+=======
+
+
+
+Siguiendo el criterio del p_valor, la evidencia empirica sugiere que las variables  Longitud1 y Altura en centimetros son individualmente significativas para explicar el peos del pez a un nivel del5%.
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 
 
 
@@ -502,7 +699,11 @@ Siguiendo el criterio del p_valor, a un nivel del 5%, la evidencia empirica sugi
 ##Homoscedasticidad 
 
 
+<<<<<<< HEAD
 ```{r,fig,cap = "Residuos externamente studentizados para el modelo 3"}
+=======
+```{r}
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 
 
 # residuos
@@ -519,14 +720,21 @@ datos$pred <- fitted(mod3)
 breusch_pagan(mod3) #No Rechazo H0) con p-valor de 0.3468923
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 ggplot(datos, aes(x = pred, y = t_i)) + 
   geom_point(color = "red",alpha=0.5,size=1)+
   xlab('Predichos') +
   ylab('Residuos') +
  geom_abline(slope=0, intercept=c(-1,1), linetype="dashed",color="blue")+
+<<<<<<< HEAD
   geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw() +  labs(caption = "Gráfico 9)",title = "Residuos externamente studentizados", subtitle = "Test de breusch pagan= 0.34")
 
+=======
+  geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 
 ```
 
@@ -552,11 +760,21 @@ ggplot(qq, aes(x = teoricos, y = empiricos)) +
 # H1) Los errores NO son normales
 
 
+<<<<<<< HEAD
 ks.test(datos$t_i, 'pnorm') #Rechazo H0) con un p-valor de 0.5317
 
 ggplot(qq, aes(x = empiricos, y=..density..)) +
   geom_histogram(breaks = seq(-3, 3, 1), col = 'white',fill='orange') + 
   xlab('Residuos studentizados')  +  theme_bw() + labs(caption = "Gráfico 10)",title = "Residuos externamente studentizados", subtitle = "Test de Kolmogorov-Smirnov= 0.53")
+=======
+shapiro.test(datos$t_i) #Rechazo H0) con un p-valor de 0.0049
+tseries::jarque.bera.test(datos$t_i) #Rechazo H0) con un p-valor de 1.794e-05
+ks.test(datos$t_i, 'pnorm') #Rechazo H0) con un p-valor de 0.5317
+
+ggplot(qq, aes(x = empiricos, y=..density..)) +
+  geom_histogram(breaks = seq(-3, 3, 1), col = 'white') +
+  xlab('Residuos studentizados')
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 ```
 
 
@@ -565,9 +783,38 @@ ggplot(qq, aes(x = empiricos, y=..density..)) +
 
 
 
+<<<<<<< HEAD
 ## ANOVA a 1 vía
 
 El objetivo es estudiar si existe igualdad de medias entre  las categorias  de la variable Especie. 
+=======
+#evaluacion de modelo 
+
+```{r}
+
+
+# bic1 = BIC(modelo)
+#bic2= BIC(modelo_ajustado)
+#bic3 = BIC(modelo_ajustado2)
+#aic1 = AIC(modelo)
+#aic2=AIC(modelo_ajustado)
+#aic3= AIC(modelo_ajustado2)
+
+#summary(modelo)$adj.r.squared
+
+#summary(modelo_ajustado)$adj.r.squared
+
+#summary(modelo_ajustado2)$adj.r.squared
+
+
+```
+
+
+
+## ANOVA a 1 vía
+
+El objetivo es estudiar si existe igualdad de medias para la variable categorica 'Especie'. 
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 Haciendo el analisis de varianza a una via, nos plantemos 2 modelos, uno solo con la constante y otro especificando la especie.
 
 El modelo con la constante queda especificado de la siguiente manera: 
@@ -580,7 +827,21 @@ $$Peso_{ij} = \mu + Especie_{ij} +  \epsilon_{ij}$$
 
 
 
+<<<<<<< HEAD
 A un nivel de significación del 5%, podemos afirmar que  tenemos  evidencia suficiente para  rechaza la hipotesis nula de igualdad de medias. 
+=======
+
+A un nivel de significacion del 5%, podemos afirmar que  tenemos  evidencia suficiente para  rechaza la hipotesis nula de igualdad de medias. 
+
+
+
+
+
+
+
+
+
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 
 
 
@@ -597,11 +858,21 @@ datos_especie <- datos %>%
 
 
 
+<<<<<<< HEAD
 datos_especie  %>%  kable() %>%   kable_styling(font_size = 8, full_width = FALSE, latex_options = "HOLD_position") %>% 
    kable_classic_2()
 
 
 
+=======
+
+
+
+
+
+## creo que anova(mod1.0) se encarga de comparar ya de por si el modelo de grupos con la que tiene solo la cte.
+
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 mod1.0<- lm(log(Peso_gr) ~ Especie, data = datos)   #Modelo con "Peso ~ Especie"
 
 
@@ -619,6 +890,15 @@ anova(mod1.0)
 
 
 
+<<<<<<< HEAD
+=======
+summary(lm((Peso_gr) ~ Especie , data = datos))
+
+
+#Vemos que para algunos peces la especie es relevante para determinar el peso mientras que para otras no
+#Por ejemplo, para los Bream estamos en el primer caso mientras que para los Smelt en el segundo
+
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 
 ggplot(datos,aes(x=Especie,y=(Peso_gr),fill=Especie)) + geom_boxplot() +xlab('Especie') + 
   ylab('Peso')
@@ -631,7 +911,10 @@ ggplot(datos,aes(x=Longitud1,y=(Peso_gr),colour =Especie)) + geom_point() +xlab(
 ```
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 ```{r}
 # residuos
 
@@ -643,15 +926,25 @@ ggplot(datos, aes(x = pred, y = t_i)) +
   geom_point(color = "red",alpha=0.5,size=1)+
   xlab('Predichos') +
   ylab('Residuos') +
+<<<<<<< HEAD
  geom_abline(slope=0, intercept=c(-1,1), linetype="dashed",color="blue")+ 
   geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()  +  labs(caption = "Gráfico 11)",title = "Residuos externamente studentizados", subtitle = "Test de breusch pagan= 0.0012")
  
+=======
+ geom_abline(slope=0, intercept=c(-1,1), linetype="dashed",color="blue")+
+  geom_abline(slope = 0, intercept = 0,color="blue")   +theme_bw()
+
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 
 
 # H0) E(eps^2_i) = sigma^2
 # H1) E(eps^2_i) = sigma^2 * h(X_1, X_2, ..., X_k)
 
+<<<<<<< HEAD
 #breusch_pagan(mod1.0) #Rechazo H0)no hay homoscedasticidad 
+=======
+breusch_pagan(mod1.0) #Rechazo H0)no hay homoscedasticidad 
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 
 # Normalidad
 
@@ -673,7 +966,13 @@ ggplot(qq, aes(x = teoricos, y = empiricos)) +
 # H1) Los errores NO son normales
 
 
+<<<<<<< HEAD
 ks.test(datos$t_i, 'pnorm') #No Rechazo H0) con p-value = 0.12
+=======
+shapiro.test(datos$t_i) #Rechazo H0) con p-value = 0.001005
+tseries::jarque.bera.test(datos$t_i) #Rechazo H0) con p-value = 4.169e-09
+ks.test(datos$t_i, 'pnorm') #No Rechazo H0) con p-value = 0.8776
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 
 ggplot(qq, aes(x = empiricos, y=..density..)) +
   geom_histogram(breaks = seq(-3, 3, 1), col = 'white') +
@@ -697,11 +996,15 @@ ggplot(qq, aes(x = empiricos, y=..density..)) +
 
 ## Ancova 
 
+<<<<<<< HEAD
 Sabiendo que la variable especie es significativo para predecir el peso de cada pez, vamos  a plantearnos un modelo en el cual tenga una variable cuantitativa (longitud1) y la variable categorica Especie.
 
 $$Peso_i = \beta_0\ +\ \beta_1log(Longitud_i)\ +\beta_2Especie_i\  +\ \epsilon_i$$
 
 Luego, para ver si existe un efecto Especie sobre la pendiente, debemos plantearnos un modelo con interaccion.
+=======
+Para ver si existe un efecto Especie sobre la pendiente, debemos plantearnos un modelo con interaccion.
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 El modelo con interaccion queda definido como:
 
 
@@ -716,7 +1019,11 @@ $$H_0) B_{i} = 0\ vs\ H_1) B_{i} \neq 0$$
 
 Se puede observar tambien mediante un grafico de puntos que existe una relacion lineal entre el peso y la longitud.  Mas aun haciendo una transformacion logaritmica  a ambas variables.
 
+<<<<<<< HEAD
 Al plantearnos el modelo con la covariable longitud1 y especie , podemos ver que  es suficiente para predecir el peso. Por lo que existe un efecto de la longitud y tambien un  efecto de la especie.
+=======
+Al plantearnos el modelo con la covariable longitud1, podemos ver que  es suficiente para predecir el peso. Por lo que existe un efecto de la longitud pero no un efecto de especie.
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 
 
 
@@ -733,7 +1040,10 @@ mod2.1 <- lm(log(Peso_gr)~ log(Longitud1) + Especie , data = datos)
 
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 anova(mod2.1,mod2.0) 
 
 
@@ -771,8 +1081,12 @@ No rechazamos $H_0)$ por lo tanto vemos que las pendientes son iguales entre las
 
 ## Supuesto de correlación
 
+<<<<<<< HEAD
 with(datos,cor(Peso_gr,Longitud1)) 
 
+=======
+with(datos,cor(Peso_gr,Longitud1))
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 # Correlacion fuerte de 0.916
 
 
@@ -816,6 +1130,11 @@ ggplot(qq, aes(x = teoricos, y = empiricos)) +
 # H1) Los errores NO son normales
 
 
+<<<<<<< HEAD
+=======
+shapiro.test(datos$t_i) #Rechazo H0) con p-value = 0.0009448
+tseries::jarque.bera.test(datos$t_i) #Rechazo H0) con p-value = 2.984e-09
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 ks.test(datos$t_i, 'pnorm') #No Rechazo H0) con p-value = 0.8061
 
 ggplot(qq, aes(x = empiricos, y=..density..)) +
@@ -823,6 +1142,11 @@ ggplot(qq, aes(x = empiricos, y=..density..)) +
   xlab('Residuos studentizados')
 
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 ```
 
 
@@ -839,6 +1163,7 @@ $$CV_{[n]}= \frac{1}{k}\sum_{i=1}^kECM_{i}$$
 
 
 ```{r}
+<<<<<<< HEAD
 set.seed(84735)
 
 mod1.1 = lm(log(Peso_gr)~ 1, data = datos)
@@ -862,6 +1187,31 @@ df = data.frame(modelo = c("modelo 1", "modelo 2","modelo 3"), k_folds_cv = c(k1
 
 df %>%  kable() %>%   kable_styling(font_size = 8, full_width = FALSE, latex_options = "HOLD_position") %>% 
     kable_classic_2()
+=======
+#set.seed(84735)
+
+
+#glm.fit <- glm(mod1.1, data=datos) ## solo la constante ~ 1 
+
+#cv.err.kfold <- cv.glm(data=datos, glmfit=glm.fit, K=10) #Solo con la constante
+#k1 = round(cv.err.kfold$delta[1],2)
+
+
+#glm.fit2 = glm(mod1.0, data = datos)
+
+#cv.err.kfold2 <- cv.glm(data=datos, glmfit=glm.fit2, K=10) #Con especie
+#k2 = round(cv.err.kfold2$delta[1],2)
+#?cv.glm
+#glm.fit3 <- glm(mod2.1, data=datos)
+#cv.err.kfold3 <- cv.glm(data=datos, glmfit=glm.fit3, K=10) #Con todo ( es decir con la covariable longitud1 y especie)
+#k3=round(cv.err.kfold3$delta[1],2)
+
+#df = data.frame(modelo = c("modelo 1", "modelo 2","modelo 3"), k_folds_cv = c(k1,k2,k3))
+
+
+#df %>%  kable() %>%   kable_styling(font_size = 8, full_width = FALSE, latex_options = "HOLD_position") %>% 
+ #   kable_classic_2()
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 
 
 
@@ -871,6 +1221,7 @@ df %>%  kable() %>%   kable_styling(font_size = 8, full_width = FALSE, latex_opt
 
 ```
 
+<<<<<<< HEAD
 # Conclusiones
 
 Mediante ensayo y error llegamos a la conclusion de  que el modelo con  una  variable explicativa alcanza para poder predecir el peso  de los peces, lo cual lo hace un modelo mas eficiente que la otra alternativa, por mas  que el  indicador del $R^2$ ajustado sea mas chico que otro modelo con mas covariables,  no es determinante para no quedarnos con este modelo. 
@@ -880,9 +1231,35 @@ Como era de esperarse, al hacer el  analisis de varianza a una via, podemos afir
 En tanto al analisis de covarianza (ANCOVA), vimos que las covariables longitud y especie, son buenas predictoras para predecir el peso, y no importa la interaccion entre ellas. 
 
 
+=======
+
+
+```{r}
+
+
+#Predicción:
+
+
+#n=nrow(datos)
+#Leave one out
+
+## se rompe todo 
+#pred<-rep(NA,n)
+
+#for(i in 1:n){
+  
+  #datos_i <- datos[-i,]
+  #mod_i <- update(modelo, data= datos_i)
+  #pred[i]<- (predict(mod_i,newdata=datos[i,])$pred)}
+
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 
 
 
 
 
+<<<<<<< HEAD
+=======
+```
+>>>>>>> a53ccad06b59c66f411b78075ee897f91d9dfd00
 
