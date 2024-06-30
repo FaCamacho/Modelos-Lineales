@@ -37,7 +37,7 @@ library(xtable)
 #Cargar los datos
 colores <- c("#003f5c", "#7a5195", "#ef5675", "#ffa600")
 
-datos <- read_excel(here("Proyecto final/ModelosLineales-main/Datos/biometria_peces.xlsx"))
+datos <- read_excel(here("biometria_peces.xlsx"))
 
 
 
@@ -853,7 +853,7 @@ cv.err.kfold <- cv.glm(data=datos, glmfit=glm.fit, K=10) #Solo con la constante
 k1 = round(cv.err.kfold$delta[1],2)
 
 
-glm.fit2 = glm(mod1.0, data = datos)
+glm.fit2 = glm(mod2.1, data = datos)
 
 cv.err.kfold2 <- cv.glm(data=datos, glmfit=glm.fit2, K=10) #Con especie
 k2 = round(cv.err.kfold2$delta[1],2)
