@@ -107,16 +107,16 @@ A efectos de tener un primer acercamiento con la estructura de los datos, se obt
 
 ```{r,fig.width=9, fig.height=4.5, warning=FALSE,message=FALSE,echo = FALSE, fig.cap ="matriz de correlacion entre las variables cuantitativas."}
 
-summary(datos)
+
 
 datos = datos %>%  mutate(Peso_gr = as.numeric(Peso_gr),Especie = as.factor(Especie)) %>% filter(.,Peso_gr > 0)
+
+summary(datos) %>% kable() %>%   kable_styling(font_size = 8, full_width = FALSE, latex_options = "HOLD_position") %>% kable_classic_2()
 
 cuanti = datos %>%  select(2:7) 
 
 
 matriz_correlacion <- cor(cuanti) 
-
-
 
 
  p =ggcorrplot::ggcorrplot(
@@ -441,7 +441,7 @@ El modelo 3 cumple con todos los supuestos y es óptimo para realizar el anális
 Siendo este un modelo mas parsimonioso para poder explicar el peso de los peses. 
 
 
-```{r, fig.cap = relacion lineal  entre la variable explicativa Longitud1 y Peso segun Especie"}
+```{r,fig.cap = "relacion lineal  entre la variable explicativa Longitud1 y Peso segun Especie"}
 
 
 longitud_especie <- ggplot(datos, aes(x = log(Longitud1), y = log(Peso_gr), color=Especie)) + 
