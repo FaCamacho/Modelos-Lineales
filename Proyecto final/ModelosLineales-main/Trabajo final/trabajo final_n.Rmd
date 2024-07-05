@@ -37,7 +37,7 @@ library(xtable)
 #Cargar los datos
 colores <- c("#003f5c", "#7a5195", "#ef5675", "#ffa600")
 
-datos <- read_excel(here("biometria_peces.xlsx"))
+datos <- read_excel(here("Modelos-Lineales/Proyecto final/ModelosLineales-main/Datos/biometria_peces.xlsx"))
 
 
 
