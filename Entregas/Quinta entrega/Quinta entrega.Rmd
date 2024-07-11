@@ -1,0 +1,45 @@
+---
+title: "Quinta entrega de Modelos Lineales"
+author: "Fabricio Camacho"
+date: "2024-07-11"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Ejercicio 1**
+
+**Sea Y una variable con distribución perteneciente a la familia exponencial, esto es:**
+
+
+**Empleando algunas propiedades del score s($\theta$) en clase se comprobó que** $E(Y) = b'(\theta)$.
+**Válgase de estas propiedades para demostrar el otro resultado que se planteó durante la clase, esto es:**
+
+$$
+f_Y(y; \phi) = \exp\left( \frac{y \theta - b(\theta)}{a(\phi)} + c(y; \phi) \right)
+$$
+
+
+**Se pide:**
+ **- Demuestre este resultado.**
+ **- Utilice estas propiedades para obtener la esperanza y Varianza de la dsitribución Poisson.**
+ **- Utilice estas propiedades para obtener la esperanza y Varianza de la dsitribución Bernoulli.**
+
+
+
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
