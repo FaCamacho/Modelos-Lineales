@@ -361,20 +361,41 @@ display: none;
 <h2><strong>Ejercicio 1</strong></h2>
 <p><strong>Sea Y una variable con distribución perteneciente a la
 familia exponencial, esto es:</strong></p>
-<p><strong>Empleando algunas propiedades del score s(<span class="math inline">\(\theta\)</span>) en clase se comprobó que</strong>
-<span class="math inline">\(E(Y) = b&#39;(\theta)\)</span>.
+<p><span class="math display">\[
+f_Y(y|\theta,\phi) = \exp\left( \frac{y \theta - b(\theta)}{a(\phi)} +
+c(y; \phi) \right)
+\]</span></p>
+<p><strong>Empleando algunas propiedades del score s(</strong><span class="math inline">\(\theta\)</span><strong>) en clase se comprobó
+que</strong> <span class="math inline">\(E(Y) = b&#39;(\theta)\)</span>.
 <strong>Válgase de estas propiedades para demostrar el otro resultado
 que se planteó durante la clase, esto es:</strong></p>
 <p><span class="math display">\[
-f_Y(y; \phi) = \exp\left( \frac{y \theta - b(\theta)}{a(\phi)} + c(y;
-\phi) \right)
+\text{Var}(Y) = b&#39;&#39;(\theta) a(\phi)
 \]</span></p>
 <p><strong>Se pide:</strong></p>
-<p><strong>-1) Demuestre este resultado.</strong></p>
-<p><strong>-2) Utilice estas propiedades para obtener la esperanza y
+<p><strong>1) Demuestre este resultado.</strong></p>
+<p><strong>2) Utilice estas propiedades para obtener la esperanza y
 Varianza de la dsitribución Poisson.</strong></p>
-<p><strong>-3) Utilice estas propiedades para obtener la esperanza y
+<p><strong>3) Utilice estas propiedades para obtener la esperanza y
 Varianza de la dsitribución Bernoulli.</strong></p>
+<div style="page-break-after: always;"></div>
+<p><br />
+</p>
+<p><strong>1)</strong></p>
+<p>Definimos la función score(<span class="math inline">\(\theta\)</span>) como la derivada respecto de
+<span class="math inline">\(\theta\)</span> del logarítmo de la densidad
+<span class="math inline">\(f_Y(y|\theta , \phi)\)</span></p>
+<p><span class="math display">\[
+s(\theta) = \frac{\partial (\log ((y \theta - b(\theta)))}{\partial
+\theta} =\frac{\partial}{\partial \theta} \left( \frac{a(\phi)(y\theta -
+b(\theta))}{a(\phi)} + c(y; \phi) \right) = \frac {y - b&#39;(\theta)}
+{a(\phi)}
+\]</span></p>
+<p>(y - b’())</p>
+<p>Luego como:</p>
+<p><span class="math display">\[E \left(\frac {y - b&#39;(\theta)}
+{a(\phi)} \right) = \frac{E(y)-b&#39;(\theta)} {a(\phi)} = \frac \mu -
+b&#39;(\theta)} {a(\phi)} = 0\]</span></p>
 </div>
 
 

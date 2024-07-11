@@ -35,14 +35,72 @@ $$
  **3) Utilice estas propiedades para obtener la esperanza y Varianza de la dsitribución Bernoulli.**
 
 
+\newpage\
 
 **1)**
 
 Definimos la función score($\theta$) como la derivada respecto de $\theta$ del logarítmo de la densidad $f_Y(y|\theta , \phi)$
 
 $$
-s(\theta) = \frac{\partial (\log ((y \theta - b(\theta)))}{\partial \theta} =\frac{\partial}{\partial \theta} \left( \frac{a(\phi)(y\theta - b(\theta))}{a(\phi)} + c(y; \phi) \right) = a(\phi) y - b'(\theta)
+s(\theta) = \frac{\partial (\log ((y \theta - b(\theta)))}{\partial \theta} =\frac{\partial}{\partial \theta} \left( \frac{a(\phi)(y\theta - b(\theta))}{a(\phi)} + c(y; \phi) \right) = \frac {y - b'(\theta)} {a(\phi)}
 $$
+
+\(y - b'(\theta))\frac{a(\phi)}
+
+
+Luego como:
+
+$$E \left(\frac {y - b'(\theta)} {a(\phi)} \right) = \frac{E(y)-b'(\theta)} {a(\phi)} = \frac{\mu-b'(\theta)}{a(\phi)} = 0 $$
+
+Tenemos que: 
+
+$$b'(\theta) = \mu = E(Y)$$
+
+Para la varianza de la función $s(\theta)$:
+
+$$
+\text{Var}(s(\theta)) = E[s(\theta)^2] - (E[s(\theta)])^2 =  E\left[\left( \frac {y - b'(\theta)} {a(\phi)} \right)^2\right] - 0 = \frac  {Var(Y)}{a(\phi)^2}
+$$
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
