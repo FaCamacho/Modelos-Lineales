@@ -9,7 +9,10 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## **Ejercicio 1**
+
+
+
+## Ejercicio 1
 
 **Sea Y una variable con distribución perteneciente a la familia exponencial, esto es:**
 
@@ -35,7 +38,7 @@ $$
  **3) Utilice estas propiedades para obtener la esperanza y Varianza de la dsitribución Bernoulli.**
 
 
-\newpage\
+\newpage
 
 **1)**
 
@@ -45,12 +48,11 @@ $$
 s(\theta) = \frac{\partial (\log ((y \theta - b(\theta)))}{\partial \theta} =\frac{\partial}{\partial \theta} \left( \frac{a(\phi)(y\theta - b(\theta))}{a(\phi)} + c(y; \phi) \right) = \frac {y - b'(\theta)} {a(\phi)}
 $$
 
-\(y - b'(\theta))\frac{a(\phi)}
 
 
 Luego como:
 
-$$E \left(\frac {y - b'(\theta)} {a(\phi)} \right) = \frac{E(y)-b'(\theta)} {a(\phi)} = \frac{\mu-b'(\theta)}{a(\phi)} = 0 $$
+$$E \left(\frac {y - b'(\theta)} {a(\phi)} \right) = \frac{E(y)-b'(\theta)} {a(\phi)} = \frac{\mu-b'(\theta)}{a(\phi)} = 0$$
 
 Tenemos que: 
 
@@ -62,45 +64,207 @@ $$
 \text{Var}(s(\theta)) = E[s(\theta)^2] - (E[s(\theta)])^2 =  E\left[\left( \frac {y - b'(\theta)} {a(\phi)} \right)^2\right] - 0 = \frac  {Var(Y)}{a(\phi)^2}
 $$
 
+Dado que $Var(Y) = E(Y)^2-E(Y^2)$:
+
+$$
+\text{Var}(s(\theta)) = E[s(\theta)^2]-E[s(\theta)]^2 = E(s(\theta)^2) = E \left[\left(\frac {(y - b'(\theta))^2} {a(\phi)^2} \right)\right]=
+$$
+
+$$
+ \left(\frac {E[(y - E(y))^2]} {a(\phi)^2} \right) = \frac {\text{Var}(Y)} {a(\phi)^2} = I(\theta) 
+$$
+
+Donde: 
+
+$$
+I(\theta) =- E\left[\frac{\partial^2}{\partial\theta^2}logfy(y,\theta)\right] = \frac {b''(\theta))}{a(\phi)} 
+$$
+
+
+$$
+I(\theta)= \frac {b''(\theta))}{a(\phi)} =\frac {\text{Var}(Y)} {a(\phi)^2}
+$$
+
+Entonces:
+
+$$
+\text {Var(Y)} =  {b''(\theta))}{a(\phi)}
+$$
 
 
 
 
 
+\newpage
+
+**2)**
+
+Sea una variable $Y$ con distribución $fy(y,\lambda)= \frac{\lambda^{y} e^{-\lambda}}{y!}$ :
+
+
+$$
+fy(y,\lambda) = exp(y log (\lambda)-\lambda-log(y!))
+$$
+
+dado que  $\theta = log(\lambda)$, $a(\phi) = 1$, $b(\theta)= e^{\theta}$ y $c(y,\theta)=log(y!)$:
+
+$$
+E[Y] = b'(\theta) =e^{\theta}= \lambda
+$$
+$$
+Var(Y)= {b''(\theta))}{a(\phi)} = e^{\theta} . 1 = \lambda 
+$$
+ 
+ 
+ \newpage
+ 
+**3)**
+
+Sea una variable $Y$ con distribución $fy(y,p)= {p^{y}(1-p)^{1-y}}$:
+
+
+$$
+fy(y,\theta) = exp(ylog\left(\frac{p}{1-p}\right)+log(1-p))
+$$
+
+Dado que: $\theta = log\frac{p}{1-p}$, $a(\phi) = 1$, $b(\theta)= log(1+e^{\theta})$ y $c(y,\theta)=0$
+
+
+
+$$
+E[Y] = b'(\theta) =\frac{e^{\theta}}{1+e^{\theta}}= p
+$$
+
+
+$$
+Var(Y)= {b''(\theta))}{a(\phi)} = \frac{e^{\theta}}{(1+e^{\theta})^2}={p}{(1-p)} 
+$$
+
+
+\newpage
+
+
+## Ejercicio 2
+
+
+En el archivoi huracanes.xlsx se dispone de la información de 337 huracanes registrados en la zona del
+Atlántico norte. A partir de este conjunto de datos se pide construir un modelo de regresión logística que
+permita determinar si la latitud donde se crea el huracán es capaz de predecir si este será de tipo tropical
+o no.
+
+
+Se pide:
+
+
+ 1) Ajuste un GLM adecuado a la variable de respuesta que se indica (tropical vs no tropical).
+
+ 2) Indique el poder predictivo de este modelo en base a los indicadores *pseudo*-R2 vistos en clase.
+ 
+ 3) Interprete el valor del coeficiente asociado a la variable *Latitud de creacion* (variable lat creacion en el conjunto de datos).
+ 
+ 4) A partir de los resultados del modelo realice un gráfico que permita visualizar la probabilidad de que un huracán sea tropical en función de su latitud de creación.
+
+
+
+```{r, echo=F}
+
+library(readxl)
+library(MASS)
+library(tidyverse)
+library(here)
+
+```
+
+
+```{r, echo=F}
+huracanes = read_excel("huracanes.xlsx")
+
+huracanes = huracanes %>%
+  mutate(trop2 = ifelse(tropical == "si", 1, 0))
+
+
+```
+
+
+
+**1)**
+
+```{r, echo=T}
+
+mod <- glm(trop2 ~ lat_creacion, data = huracanes, family = binomial) #Modelo 
+
+```
+
+**2)**
+
+
+```{r,echo=T}
+
+Mcfaden <- 1 - (mod$deviance / mod$null.deviance)
+
+cat("Pseudo R2=",Mcfaden)
+
+```
+
+
+**3)**
+
+```{r,echo=T}
+
+
+summary(mod)
+
+```
+
+
+El modelo explica el **49.9%** de la varianza al explicar si el huracan es tropical o no según la latitud según *Mc Faden*
+
+La variable explicativa *lat_creación* es significativa para el modelo con un *p-valor* < 0.001
+
+La relación entre la latitud y el tipo de huracan esta dada por:
+
+A medida que si la latitud aumenta una unidad la probabilidad de que no sea tropical es de **68.87%**, siendo este valor $e^\beta$.
+
+Mientras que la latitud aumenta una unidad la probabilidad de que el huracan sea tropical son del **31,13%**, siendo este valor el complemento de la interpretación anterior. 
+
+
+
+**4)**
+
+```{r,message=F,warning=F}
+
+
+ggplot(huracanes, aes(x = lat_creacion, y = trop2)) +
+  geom_point() +
+  #xlab('Latitud') + 
+  #ylab('Prob Tropical') +
+  labs(title = "Probabilidad de que un huracán sea tropical en función de su latitud de creación",
+       x = "Latitud",
+       y = "Prob tropical") +
+  theme_bw() -> p1
+#p1
+
+# la interpretacion de b1
+betas <- coef(mod)
+exp(betas[2])
 
 
 
 
+xp <- min(huracanes$lat_creacion):max(huracanes$lat_creacion)
+b0 <- betas[1]
+b1 <- betas[2]
+curva <- data.frame(lat_creacion = xp, trop2 = exp(b0 + b1*xp)/(1 +  exp(b0 + b1*xp)))
+
+#p1 + 
+ # geom_line(data = curva, col = 'red', size = 2)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# grafiquemos la curva Y la recta
+p1 + 
+  geom_line(data = curva, col = 'red', size = 2) 
+ # geom_line(data = recta, col = 'blue', size = 2)
+```
 
 
 

@@ -3,7 +3,7 @@
 # cargamos los datos del diagnostico de enfermedad coronaria (CHD)
 library(readxl)
 datos <- read_excel("chd.xlsx")
-
+datos = chd
 # Nos fijamos que los datos se hayan cargado bien
 str(datos)
 
